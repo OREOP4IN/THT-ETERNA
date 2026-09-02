@@ -195,3 +195,48 @@ We are creating **StockFlow**, a focused, professional-grade Inventory & Invoici
 
 5. **Complete Test Suite Included:**  
    All 5 mandatory automated test scenarios required by the evaluation team (unauthorized requests, wrong password, stock limits, stock deduction, and stock restoration) plus edge cases are codified with Vitest and Supertest, passing with a single `npm test` command.
+
+---
+
+## 🔍 Tech Stack Compliance Audit & Justification
+
+### 1. Direct Compliance Mapping (Section 2 of Task Specification)
+
+Every primary technology selected comes directly from the permitted options explicitly enumerated in `fullstack-js-take-home-test.md`:
+
+| Concern | Task Specification Options | Our Selected Choice | Compliance Status |
+|---|---|---|---|
+| **Server Runtime** | Node.js (Required) | Node.js (v20+ LTS) | ✅ **100% Match** |
+| **Backend Framework** | NestJS, Express, Fastify, Hapi, Koa, Next.js API routes | **Express.js** | ✅ **Direct Match** |
+| **Frontend Framework** | React, Next.js, Vue, Nuxt, Svelte, Angular, Remix | **React (Vite)** | ✅ **Direct Match** |
+| **Programming Language** | JavaScript or TypeScript (TypeScript preferred) | **TypeScript (Strict Mode)** | ✅ **Preferred Match** |
+| **Database** | PostgreSQL, MySQL/MariaDB, SQLite, MongoDB ("SQLite counts") | **SQLite** | ✅ **Direct Match** |
+| **ORM / Data Layer** | Prisma, TypeORM, Drizzle, Sequelize, Mongoose, Knex, raw SQL | **Prisma ORM** | ✅ **Direct Match** |
+| **Styling / UI Kit** | Tailwind, MUI, Chakra, shadcn/ui, Bootstrap, plain CSS | **Tailwind CSS** | ✅ **Direct Match** |
+| **Project Layout** | Monorepo or Two Folders | **Monorepo (`server/` + `client/`)** | ✅ **Direct Match** |
+| **Auth Credential** | JWT or httpOnly session cookie (Section 4.1 A2) | **JWT (Bearer Token)** | ✅ **Direct Match** |
+| **Password Hashing** | Bcrypt or Argon2 with salt (Section 4.1 A4) | **Bcrypt (12 rounds)** | ✅ **Direct Match** |
+| **API Documentation** | Swagger/OpenAPI, Postman/Bruno, README table (Section 5 N5) | **Swagger / OpenAPI (`swagger-ui-express`)** | ✅ **Direct Match** |
+
+---
+
+### 2. Complementary Libraries Not Formally Enumerated in Section 2 & Technical Justifications
+
+The task specification leaves specific sub-libraries (validation, testing framework, HTTP client, client-side cache) to developer discretion while mandating strict behavioral outcomes (e.g. "Server-side validation returning 400/422", "at minimum 5 automated tests", "loading and error states"). Below are the specific libraries chosen and why:
+
+#### A. Zod (Runtime Schema & Request Validation)
+- **Why It Was Chosen:**  
+  Requirement **I3** and **A5** require strict server-side validation returning structured field-level 400/422 error responses. Zod provides declarative, type-inferred validation that bridges TypeScript compile-time types with runtime HTTP boundaries. It eliminates boilerplate validation checks and prevents malformed data from ever touching controllers or services.
+
+#### B. Vitest & Supertest (Automated Testing Framework)
+- **Why It Was Chosen:**  
+  Requirement **N4** mandates at least 5 automated integration tests executable with a single command. Vitest executes TypeScript natively with ES modules without complex Babel/ts-jest transformation overhead. Paired with Supertest, it enables testing HTTP endpoints and Prisma transactions against an ephemeral SQLite test database in milliseconds.
+
+#### C. TanStack Query / React Query & Axios (Client State & HTTP Requests)
+- **Why It Was Chosen:**  
+  Requirement **F6** requires smooth loading skeletons, spinners, and error alerts without leaving the user staring at blank screens. TanStack Query provides out-of-the-box declarative query states (`isLoading`, `isError`, `data`), automatic background cache revalidation, and mutation triggers for seamless UI updates upon product/invoice mutations. Axios simplifies setting up global request interceptors to automatically attach JWT Bearer tokens and handle 401 redirects.
+
+#### D. Lucide React (Iconography)
+- **Why It Was Chosen:**  
+  Provides featherweight, accessible SVG icons (status badges, action buttons, search icons) that pair seamlessly with Tailwind CSS classes without introducing bulky component library overhead.
+
