@@ -1,177 +1,284 @@
 # StockFlow — Master Task List & Implementation Roadmap
 
-This document outlines the end-to-end implementation plan for the **StockFlow** Inventory & Invoicing application based on the requirements in `fullstack-js-take-home-test.md`.
+This document establishes the **prioritized, vertically sliced implementation roadmap** for **StockFlow** (Inventory & Invoicing Web Application) based on `fullstack-js-take-home-test.md`.
 
 ---
 
-## 📋 Comprehensive Implementation Checklist
+## 🎯 Architecture & Execution Strategy: Vertical Slicing
 
-### Phase 1: Project Scaffolding & Monorepo Configuration
-- [ ] Initialize monorepo structure with `server/` and `client/` workspaces.
-- [ ] Configure root `package.json` with scripts (`dev`, `build`, `test`, `db:migrate`, `db:seed`).
-- [ ] Set up TypeScript configuration (`tsconfig.json`) for backend with strict mode enabled.
-- [ ] Initialize Vite + React + TypeScript in `client/` with Tailwind CSS and Lucide icons.
-- [ ] Configure `.gitignore` to protect environment files, build artifacts, SQLite database files, and dependencies.
-- [ ] Create `.env.example` documenting all configuration keys (`PORT`, `DATABASE_URL`, `JWT_SECRET`, `TAX_RATE_PERCENT`, `CORS_ORIGIN`).
+To ensure every phase is **comprehensible, immediately debuggable, and interactive**, the roadmap is structured into **vertical feature slices**. 
+
+Instead of building a detached backend for days before touching the frontend, **each phase delivers a working, interactive prototype increment** (API + Database + UI + Live Verification Checkpoint). You can launch the application at the end of every phase to click around, test features, and visually verify system state.
+
+```mermaid
+graph TD
+    P1["Phase 1: Scaffolding & Live Skeleton (Port 5000 + 5173)"] --> P2["Phase 2: Database Modeling, Seeding & Prisma Studio"]
+    P2 --> P3["Phase 3: Auth & Tenant Isolation (Vertical Slice)"]
+    P3 --> P4["Phase 4: Product Inventory (Vertical Slice)"]
+    P4 --> P5["Phase 5: Invoicing Engine & Stock State Machine (Vertical Slice)"]
+    P5 --> P6["Phase 6: Automated Test Suite (5 Mandatory Tests)"]
+    P6 --> P7["Phase 7: DX Polish, Audit Ledger & Bonus Items"]
+    P7 --> P8["Phase 8: Submission Verification & Clean Clone Drill"]
+```
 
 ---
 
-### Phase 2: Database Modeling & Data Seeding
-- [ ] Configure Prisma ORM with SQLite provider.
-- [ ] Implement Prisma schema models:
-  - [ ] `User` (id, email, passwordHash, name, timestamps)
-  - [ ] `Product` (id, userId, sku, name, description, unitPrice in cents, quantityOnHand, timestamps)
-  - [ ] `Invoice` (id, userId, invoiceNumber, customerName, issueDate, dueDate, status, notes, subtotal, taxRate, taxAmount, total, timestamps)
-  - [ ] `InvoiceItem` (id, invoiceId, productId, productName snapshot, unitPrice snapshot in cents, quantity, lineTotal)
-  - [ ] `StockMovement` (id, productId, invoiceId, quantityChange, reason, timestamp)
-- [ ] Add unique compound index on `Product(userId, sku)` and indexes on search fields.
-- [ ] Generate initial Prisma migration (`prisma migrate dev`).
-- [ ] Implement idempotent seed script (`server/prisma/seed.ts`):
+## 📋 Prioritized Master Task List
+
+### Phase 1: Project Scaffolding & Interactive Shell (Foundation)
+**Priority:** P0 (Highest)  
+**Objective:** Establish unified monorepo development environment with running backend and frontend servers from minute one.
+
+- [ ] Initialize monorepo directory layout:
+  - [ ] `server/` (Node.js + Express + TypeScript)
+  - [ ] `client/` (React + Vite + TypeScript + Tailwind CSS + Lucide Icons)
+- [ ] Configure root `package.json` with scripts:
+  - [ ] `npm run dev`: Boots server (`:5000`) and client (`:5173`) concurrently.
+  - [ ] `npm run build`: Compiles both projects.
+  - [ ] `npm test`: Runs automated test suite.
+  - [ ] `npm run db:migrate` & `npm run db:seed`: Database controls.
+- [ ] Set up server structure:
+  - [ ] `server/src/app.ts` with CORS, JSON body parser, and request logger.
+  - [ ] Health check endpoint: `GET /api/health` returning uptime and status.
+  - [ ] Mount Swagger / OpenAPI UI at `GET /api/docs`.
+- [ ] Set up client structure:
+  - [ ] Vite React setup with Tailwind CSS configured.
+  - [ ] Root Layout with navigation header and backend connectivity indicator badge.
+- [ ] Create `.env.example` and root `.gitignore`.
+
+> 🕹️ **Interactive Debugging & Verification Checkpoint:**
+> 1. Run `npm run dev` from root.
+> 2. Open `http://localhost:5173` → Verify client renders styled header with green "Backend Connected ✅" status.
+> 3. Open `http://localhost:5000/api/health` → Verify JSON `{ status: "ok", uptime: ... }`.
+> 4. Open `http://localhost:5000/api/docs` → Verify interactive Swagger API documentation console loads.
+
+---
+
+### Phase 2: Database Layer, Seed Data & Visual Data Inspector
+**Priority:** P0 (Highest)  
+**Objective:** Model the relational schema with SQLite and Prisma, and equip the developer with a visual database explorer.
+
+- [ ] Configure Prisma ORM in `server/` with SQLite provider (`DATABASE_URL="file:./dev.db"`).
+- [ ] Define Prisma Schema:
+  - [ ] `User`: `id`, `email` (unique), `passwordHash`, `name`, `createdAt`, `updatedAt`
+  - [ ] `Product`: `id`, `userId`, `sku`, `name`, `description`, `unitPrice` (Int, minor cents), `quantityOnHand` (Int), `createdAt`, `updatedAt`
+  - [ ] `Invoice`: `id`, `userId`, `invoiceNumber` (unique), `customerName`, `issueDate`, `dueDate`, `status` (Enum: DRAFT, ISSUED, PAID, CANCELLED), `notes`, `subtotal` (Int), `taxRate` (Int), `taxAmount` (Int), `total` (Int), timestamps
+  - [ ] `InvoiceItem`: `id`, `invoiceId`, `productId` (optional/restrict), `productName` (snapshot), `unitPrice` (snapshot in cents), `quantity` (>0), `lineTotal` (cents)
+  - [ ] `StockMovement`: `id`, `productId`, `invoiceId` (optional), `quantityChange`, `reason`, `createdAt`
+- [ ] Compound index: `Product(userId, sku)` unique index for workspace-level SKU uniqueness.
+- [ ] Run initial migration (`npx prisma migrate dev --name init`).
+- [ ] Implement seed script (`server/prisma/seed.ts`):
   - [ ] Demo user: `demo@stockflow.dev` / `Password123!`
-  - [ ] Minimum 5 diverse products with varied stock levels and unit prices.
+  - [ ] 5 realistic distribution products with varying stock counts and prices.
+- [ ] Configure `npm run db:studio` script in root package.json.
+
+> 🕹️ **Interactive Debugging & Verification Checkpoint:**
+> 1. Run `npm run db:migrate` and `npm run db:seed`.
+> 2. Run `npm run db:studio` → Launches web interface at `http://localhost:5555`.
+> 3. Interactively inspect the database tables, verify the demo user is created with a hashed password, and inspect the 5 seeded products.
 
 ---
 
-### Phase 3: Authentication & Security Subsystem
-- [ ] Password hashing utility with `bcrypt` (salt rounds = 12) or `argon2`.
-- [ ] Zod validation schemas for registration and login payloads.
-- [ ] Implement `POST /api/auth/register`:
-  - [ ] Enforce unique email (case-insensitive)
-  - [ ] Validate minimum password length (≥ 8 characters)
-  - [ ] Return clean user object (excluding passwordHash)
-- [ ] Implement `POST /api/auth/login`:
-  - [ ] Verify credentials
-  - [ ] Return JWT token with 7-day expiration
-  - [ ] Obfuscate failure reasons (generic "Invalid email or password" on both missing user and bad password)
-- [ ] Implement `GET /api/auth/me` to fetch current user profile.
-- [ ] Implement `POST /api/auth/logout` endpoint.
-- [ ] Implement `authenticate` middleware:
-  - [ ] Extract Bearer token from `Authorization` header
-  - [ ] Verify token signature and attach `req.user`
-  - [ ] Return HTTP `401 Unauthorized` for missing, expired, or invalid tokens
-- [ ] Multi-tenant isolation: Ensure all subsequent routes scope database queries with `where: { userId: req.user.id }`.
+### Phase 3: Authentication & Workspace Isolation (Vertical Slice)
+**Priority:** P0 (Highest)  
+**Objective:** End-to-end user registration, login, token management, and workspace tenant protection.
+
+- [ ] **Backend Security Subsystem:**
+  - [ ] Bcrypt password hashing utility (salt rounds = 12).
+  - [ ] JWT sign and verify helpers with 7-day expiration.
+  - [ ] Zod request schemas for register and login payloads (minimum 8 char password).
+  - [ ] `POST /api/auth/register`: Create user, return sanitized profile (no password hash).
+  - [ ] `POST /api/auth/login`: Validate credentials, return JWT token.
+  - [ ] **Security Rule A9:** Obfuscate failure reasons (always return generic `"Invalid email or password"` on both missing user and wrong password).
+  - [ ] `GET /api/auth/me`: Return authenticated user info.
+  - [ ] `POST /api/auth/logout`: Acknowledge client token invalidation.
+  - [ ] `authenticate` middleware: Verify Bearer token from header; reject with HTTP 401 if missing or invalid.
+  - [ ] Multi-tenant isolation helper: inject `where: { userId: req.user.id }` into database queries.
+- [ ] **Frontend Authentication UI & State:**
+  - [ ] Axios client with request interceptor (attaches `Authorization: Bearer <token>`) and 401 interceptor.
+  - [ ] `AuthContext` with login, logout, and token persistence in localStorage.
+  - [ ] `/login` screen: Email & password fields, client validation, server error banner.
+  - [ ] `/register` screen: Full name, email, password fields.
+  - [ ] `ProtectedRoute` wrapper: Automatically redirects unauthenticated visitors to `/login`.
+  - [ ] User status bar in Navbar displaying logged-in user name and a "Logout" button.
+
+> 🕹️ **Interactive Debugging & Verification Checkpoint:**
+> 1. Open `http://localhost:5173/products` while logged out → Verify immediate redirect to `/login`.
+> 2. Attempt login with wrong password (`wrongpass`) → See red error banner: "Invalid email or password" (HTTP 401).
+> 3. Login with `demo@stockflow.dev` / `Password123!` → Login succeeds, token stored, redirected to dashboard with user avatar/name.
+> 4. Click "Logout" → Token cleared, immediately redirected back to `/login`.
+> 5. Open Swagger UI at `http://localhost:5000/api/docs`, paste JWT into Authorize modal, execute `/api/auth/me` to verify API auth.
 
 ---
 
-### Phase 4: Product Inventory Subsystem
-- [ ] Implement Zod schemas for Product creation and updates:
-  - [ ] `sku` required, non-empty
-  - [ ] `name` required, non-empty
-  - [ ] `unitPrice` integer ≥ 0 (in minor units / cents)
-  - [ ] `quantityOnHand` integer ≥ 0
-- [ ] Implement `POST /api/products`:
-  - [ ] Validate uniqueness of SKU within user's workspace
-  - [ ] Persist product and return HTTP 201
-- [ ] Implement `GET /api/products`:
-  - [ ] Pagination (`page`, `limit`) with defaults (page 1, limit 10)
-  - [ ] Case-insensitive search filtering by `name` or `sku`
-  - [ ] Return `{ data: [...], meta: { page, limit, total, totalPages } }`
-- [ ] Implement `GET /api/products/:id`:
-  - [ ] Return product details or 404 if not found or belongs to another user
-- [ ] Implement `PUT /api/products/:id`:
-  - [ ] Validate and update product fields
-- [ ] Implement `DELETE /api/products/:id`:
-  - [ ] **Referential Integrity Guard:** Verify if product is linked to any existing `InvoiceItem`.
-  - [ ] If linked, reject deletion with HTTP `409 Conflict` ("Cannot delete product because it is referenced in an invoice").
-  - [ ] If not linked, delete product and return HTTP 200/204.
+### Phase 4: Product Inventory Management (Vertical Slice)
+**Priority:** P1 (Core Feature)  
+**Objective:** Full-featured product catalog management with real-time search, pagination, and deletion referential guards.
+
+- [ ] **Backend Product CRUD:**
+  - [ ] Zod schemas: `sku` (string, min 1), `name` (string, min 1), `unitPrice` (integer ≥ 0 in minor units), `quantityOnHand` (integer ≥ 0), `description` (optional).
+  - [ ] `POST /api/products`: Create product, enforce unique SKU within user workspace.
+  - [ ] `GET /api/products`: Paginated product list with search query (`?search=xyz&page=1&limit=10`).
+  - [ ] `GET /api/products/:id`: Fetch single product by ID (scoped to `userId`).
+  - [ ] `PUT /api/products/:id`: Update product attributes.
+  - [ ] `DELETE /api/products/:id`:
+    - [ ] **Referential Guard (I4):** Query if product is referenced by any `InvoiceItem`.
+    - [ ] If referenced: Block deletion with HTTP 409 Conflict (`"Cannot delete product '[Name]' because it is referenced in one or more invoices."`).
+    - [ ] If not referenced: Safely delete product.
+- [ ] **Frontend Product Catalog UI:**
+  - [ ] `/products` view with search input (with 300ms debounce).
+  - [ ] Responsive product table displaying SKU, Name, Description, Unit Price (formatted in localized currency), and Quantity on Hand.
+  - [ ] Pagination controls (`Previous`, `Page X of Y`, `Next`).
+  - [ ] "New Product" modal with integer cents conversion from dollar input.
+  - [ ] "Edit Product" modal with prefilled data.
+  - [ ] Delete button with confirmation modal and error toast handling (displays 409 error clearly).
+
+> 🕹️ **Interactive Debugging & Verification Checkpoint:**
+> 1. In browser, navigate to `/products` → Verify the 5 seeded products render with formatted prices and stock levels.
+> 2. Type "Widget" or an SKU in the search box → Table dynamically filters.
+> 3. Click "New Product" → Create "Smart Sensor X" with Price `$45.50` (internally stored as `4550` cents) and Stock `10`.
+> 4. Verify "Smart Sensor X" appears at top of table with `$45.50` and stock `10`.
+> 5. Edit "Smart Sensor X" stock to `15` → Verify table updates instantly.
+> 6. Delete "Smart Sensor X" → Verify item is removed.
 
 ---
 
-### Phase 5: Invoicing Engine & State Machine
-- [ ] Invoice number generator utility (e.g. `INV-YYYY-XXXX`).
-- [ ] Money & Tax calculation service:
-  - [ ] Strict integer minor units (cents) for `lineTotal = quantity * unitPrice`.
-  - [ ] $\text{subtotal} = \sum \text{lineTotal}$.
-  - [ ] $\text{taxAmount} = \text{Math.round}((\text{subtotal} \times \text{taxRatePercent}) / 100)$.
-  - [ ] $\text{total} = \text{subtotal} + \text{taxAmount}$.
-- [ ] Implement `POST /api/invoices`:
-  - [ ] Validate customer name, dates, and non-empty line items array
-  - [ ] Validate all referenced product IDs exist in user workspace
-  - [ ] **Stock Guard:** Verify each line quantity $\le$ current product `quantityOnHand`. If exceeded, reject with HTTP 422.
-  - [ ] **Snapshotting:** Copy current `product.name` and `product.unitPrice` onto `InvoiceItem`.
-  - [ ] Calculate server-side totals (ignore any totals sent by client).
-  - [ ] Set initial status to `DRAFT`.
-- [ ] Implement `GET /api/invoices`:
-  - [ ] Pagination (`page`, `limit`)
-  - [ ] Filter by status (`DRAFT`, `ISSUED`, `PAID`, `CANCELLED`)
-- [ ] Implement `GET /api/invoices/:id`:
-  - [ ] Return complete invoice with line items and product details.
-- [ ] Implement `PUT /api/invoices/:id`:
-  - [ ] Reject edit with HTTP 422 if invoice status is NOT `DRAFT`.
-  - [ ] Recalculate line totals and re-verify stock.
-- [ ] Implement `POST /api/invoices/:id/issue`:
-  - [ ] Validate invoice status is `DRAFT`.
-  - [ ] **Atomic Transaction:** Inside `prisma.$transaction`:
-    1. Re-verify available stock for all line items.
-    2. Decrement `quantityOnHand` for each product.
-    3. Record `StockMovement` entries for audit trail.
-    4. Update status to `ISSUED`.
-- [ ] Implement `POST /api/invoices/:id/pay`:
-  - [ ] Validate status transition: allowed ONLY from `ISSUED` to `PAID`.
-  - [ ] Mark status as `PAID`.
-- [ ] Implement `POST /api/invoices/:id/cancel`:
-  - [ ] Validate status: allowed from `DRAFT` or `ISSUED`.
-  - [ ] If status was `ISSUED`:
-    - **Atomic Transaction:** Restore product stock (`quantityOnHand += item.quantity`) and record `StockMovement`.
-  - [ ] If status was `DRAFT`:
-    - Transition directly to `CANCELLED` without stock adjustment.
-  - [ ] If status is `PAID` or already `CANCELLED`, reject with HTTP 422 (terminal state).
+### Phase 5: Invoicing Engine & Stock State Machine (Vertical Slice)
+**Priority:** P1 (Core Business Logic — 20% Evaluation Weight)  
+**Objective:** Complete invoice creation, live minor-unit currency calculations, atomic stock deduction on issue, and stock restoration on cancellation.
 
----
-
-### Phase 6: Automated Testing Suite
-- [ ] Configure Vitest and Supertest with dedicated test database environment.
-- [ ] Implement Mandatory Test Suite (`tests/core.test.ts`):
-  - [ ] **Test 1:** Login with incorrect password returns 401.
-  - [ ] **Test 2:** Unauthenticated request to `/api/products` and `/api/invoices` returns 401.
-  - [ ] **Test 3:** Creating/issuing an invoice with quantity exceeding stock returns 422.
-  - [ ] **Test 4:** Issuing an invoice decrements product stock atomically.
-  - [ ] **Test 5:** Cancelling an issued invoice restores stock atomically.
-- [ ] Implement Additional Edge Case Tests:
-  - [ ] State transition violations (e.g. paying a DRAFT invoice, editing an ISSUED invoice).
-  - [ ] Deleting a product referenced in an invoice returns 409 Conflict.
-  - [ ] Product price change does not modify existing invoice snapshots.
-- [ ] Verify single command test execution: `npm test` passes cleanly.
-
----
-
-### Phase 7: Frontend Application (Client)
-- [ ] Setup Axios client with authentication request interceptor (attaching Bearer token) and 401 response interceptor.
-- [ ] Setup Auth context & state management (stored in localStorage or memory).
-- [ ] Implement UI views & routing:
-  - [ ] `/login` & `/register` forms with field validation and server error callouts.
-  - [ ] Protected Layout with navigation bar, user indicator, and Logout action.
-  - [ ] `/products` Product List:
-    - Search input with debounce.
-    - Responsive table with pagination controls.
-    - "Add Product" & "Edit Product" modal dialogs with unit price and stock input.
-    - Delete button with confirmation and error handling.
-  - [ ] `/invoices` Invoice List:
-    - Filter tabs by status (`All`, `DRAFT`, `ISSUED`, `PAID`, `CANCELLED`).
-    - Status badges with distinct semantic colors.
+- [ ] **Backend Invoicing & Calculation Engine:**
+  - [ ] Invoice sequence generator utility (`INV-YYYY-XXXX`).
+  - [ ] Calculation service:
+    - [ ] $\text{lineTotal} = \text{quantity} \times \text{unitPrice}$ (all integers).
+    - [ ] $\text{subtotal} = \sum \text{lineTotal}$.
+    - [ ] $\text{taxAmount} = \text{Math.round}((\text{subtotal} \times \text{DEFAULT\_TAX\_PERCENT}) / 100)$ (default 11%).
+    - [ ] $\text{total} = \text{subtotal} + \text{taxAmount}$.
+    - [ ] Server recalculates all values; never trusts client-submitted totals.
+  - [ ] `POST /api/invoices`:
+    - [ ] Validate non-empty items array.
+    - [ ] **Stock Guard (V5):** Check $\forall i, \text{item}_i.\text{quantity} \le \text{product}_i.\text{quantityOnHand}$. Reject with HTTP 422 if insufficient.
+    - [ ] **Snapshotting (V4):** Store current `product.name` and `product.unitPrice` onto `InvoiceItem`.
+    - [ ] Create invoice in `DRAFT` status.
+  - [ ] `GET /api/invoices`: List invoices with status filter (`?status=DRAFT&page=1&limit=10`).
+  - [ ] `GET /api/invoices/:id`: Fetch invoice details with snapshot line items.
+  - [ ] `PUT /api/invoices/:id`: Allow editing header/items **only** if status is `DRAFT`; reject with 422 if `ISSUED`, `PAID`, or `CANCELLED`.
+  - [ ] **State Machine & Atomic Transactions:**
+    - [ ] `POST /api/invoices/:id/issue` (`DRAFT` → `ISSUED`):
+      - [ ] Wrap in `prisma.$transaction`.
+      - [ ] Re-verify current stock on hand for all line items.
+      - [ ] Decrement each product's `quantityOnHand` atomically.
+      - [ ] Record `StockMovement` entries (`reason: "INVOICE_ISSUED"`).
+      - [ ] Update invoice status to `ISSUED`.
+    - [ ] `POST /api/invoices/:id/pay` (`ISSUED` → `PAID`):
+      - [ ] Validate status transition; mark status as terminal `PAID`.
+    - [ ] `POST /api/invoices/:id/cancel`:
+      - [ ] If status is `ISSUED`: wrap in transaction, restore stock (`quantityOnHand += item.quantity`), record `StockMovement` (`reason: "INVOICE_CANCELLED"`), update to `CANCELLED`.
+      - [ ] If status is `DRAFT`: update to `CANCELLED` (no stock adjustments).
+      - [ ] If status is `PAID` or `CANCELLED`: reject with HTTP 422 (terminal state).
+- [ ] **Frontend Invoicing UI:**
+  - [ ] `/invoices` view: Filterable status tabs (`All`, `DRAFT`, `ISSUED`, `PAID`, `CANCELLED`), status pill badges with distinct colors, and paginated table.
   - [ ] `/invoices/new` Interactive Invoice Creator:
-    - Customer details & dates.
-    - Dynamic line item table with product picker, real-time available stock indicator, quantity input.
-    - Live breakdown of Subtotal, Tax (11%), and Grand Total.
+    - [ ] Customer Name, Issue Date, Due Date, Notes.
+    - [ ] Dynamic line item row builder:
+      - [ ] Product selector showing real-time available stock badge.
+      - [ ] Quantity input with instant client validation warning if requested > available stock.
+      - [ ] Live line total computation.
+      - [ ] Add line / Remove line buttons.
+    - [ ] Live Summary Card: Reactive Subtotal, Tax (11%), and Grand Total.
+    - [ ] "Save as Draft" button.
   - [ ] `/invoices/:id` Invoice Detail View:
-    - Clean, printable invoice layout.
-    - Action toolbar: `Issue Invoice`, `Mark as Paid`, `Cancel Invoice`.
-- [ ] Provide clear loading skeletons, spinner feedback, and empty states.
+    - [ ] Formatted printable invoice layout.
+    - [ ] Dynamic Action Bar based on invoice state:
+      - [ ] `DRAFT`: "Issue Invoice", "Edit", "Cancel Invoice".
+      - [ ] `ISSUED`: "Mark as Paid", "Cancel Invoice".
+      - [ ] `PAID` / `CANCELLED`: Read-only badge indicator.
+
+> 🕹️ **Interactive Debugging & Verification Checkpoint:**
+> 1. Navigate to `/invoices/new`.
+> 2. Pick "Demo Product A" (suppose stock = 10), type quantity `15` → Observe live warning: "Requested quantity (15) exceeds available stock (10)".
+> 3. Adjust quantity to `2`, add a second product line for `1` unit → Watch Subtotal, 11% Tax, and Total calculate reactively.
+> 4. Submit invoice → Redirected to `/invoices/:id` in `DRAFT` status.
+> 5. Click "Issue Invoice" → Status badge transitions to `ISSUED`.
+> 6. Open `/products` in a new tab → Verify stock for "Demo Product A" automatically decreased by 2!
+> 7. Return to invoice detail and click "Cancel Invoice" → Status becomes `CANCELLED`.
+> 8. Refresh `/products` → Verify stock was restored to its original value!
+> 9. Try deleting "Demo Product A" from `/products` → See HTTP 409 Conflict alert ("Product is referenced in invoice").
 
 ---
 
-### Phase 8: Documentation & Developer Experience
-- [ ] Write comprehensive `README.md`:
-  - [ ] Prerequisites (Node.js version).
-  - [ ] Quickstart instructions (clone -> install -> seed -> run).
-  - [ ] Demo login credentials.
-  - [ ] Architectural decisions & tech stack rationale.
-  - [ ] Trade-offs and known limitations.
-  - [ ] "What I would do with one more week" section.
-  - [ ] AI Usage statement detailing tools and workflows used.
-  - [ ] Time spent report.
-- [ ] Setup interactive API documentation with Swagger / OpenAPI (`/api/docs`).
-- [ ] Verify clean, incremental git commit history across all stages.
+### Phase 6: Automated Testing Suite & Regression Shield
+**Priority:** P1 (Mandatory Requirement N4 — 8% Evaluation Weight)  
+**Objective:** Codify all mandatory business invariants into fast, automated Vitest + Supertest integration suites.
+
+- [ ] Setup Vitest test runner in `server/` with isolated test SQLite database.
+- [ ] Implement Mandatory Test Suite (`server/tests/core.test.ts`):
+  - [ ] **Test 1 (Auth):** Login with wrong password returns HTTP 401.
+  - [ ] **Test 2 (Auth):** Unauthenticated request to protected endpoints (`/api/products`, `/api/invoices`) returns HTTP 401.
+  - [ ] **Test 3 (Stock Guard):** Invoicing quantity exceeding `quantityOnHand` returns HTTP 422 with stock error.
+  - [ ] **Test 4 (Atomic Issue):** Issuing an invoice decrements product stock on hand accurately in database.
+  - [ ] **Test 5 (Atomic Cancel):** Cancelling an issued invoice restores product stock on hand accurately.
+- [ ] Implement Edge Case Test Suite (`server/tests/edge-cases.test.ts`):
+  - [ ] Deleting a product referenced in an invoice returns HTTP 409 Conflict.
+  - [ ] Updating a product catalog price does NOT alter unit price on historical invoices.
+  - [ ] Illegal state transitions (e.g. attempting to pay a `DRAFT` invoice or edit an `ISSUED` invoice) return HTTP 422.
+- [ ] Configure `npm test` script in root package.json to execute tests and report clean output.
+
+> 🕹️ **Interactive Debugging & Verification Checkpoint:**
+> 1. Run `npm test` from root terminal.
+> 2. Observe Vitest console output executing tests against the test database.
+> 3. Verify all 5 mandatory test suites pass with 100% green checkmarks in < 2 seconds.
+
+---
+
+### Phase 7: Developer Experience, DX Polish & Bonus Enhancements
+**Priority:** P2 (High Value Extras)  
+**Objective:** Add high-impact polish and optional bonus features from Section 6 without over-scoping.
+
+- [ ] **Audit Trail Ledger (Bonus):**
+  - [ ] Display product stock movement history in product detail / drawer (`StockMovement` table).
+- [ ] **Rate Limiting (Bonus):**
+  - [ ] Implement `express-rate-limit` on `/api/auth/login` (e.g. max 10 attempts per 15 minutes per IP).
+- [ ] **Print / PDF View (Bonus):**
+  - [ ] Add clean `@media print` CSS styling on invoice detail page with "Print / Save PDF" button.
+- [ ] **UI Polish & Feedback:**
+  - [ ] Animated loading skeletons on tables and cards.
+  - [ ] Clean error toast notifications via `react-hot-toast` or simple toast alert component.
+  - [ ] Empty state illustrations when lists are empty.
+- [ ] **Swagger Documentation Completeness:**
+  - [ ] Ensure all endpoints, request bodies, and standard error responses are annotated in `/api/docs`.
+
+> 🕹️ **Interactive Debugging & Verification Checkpoint:**
+> 1. On `/invoices/:id`, click "Print / Save as PDF" → Browser opens clean, unbranded print preview formatted for paper.
+> 2. Rapidly spam invalid login submissions 10 times → Receive HTTP 429 "Too Many Requests" rate-limit response.
+> 3. Open `/api/docs` and execute each API route interactively through the Swagger web UI.
+
+---
+
+### Phase 8: Submission Readiness & Evaluation Verification
+**Priority:** P1 (Delivery Critical)  
+**Objective:** Ensure zero-friction evaluator onboarding and flawless compliance with submission checklist.
+
+- [ ] Write comprehensive, high-clarity `README.md`:
+  - [ ] Prerequisites (Node.js v20+).
+  - [ ] Zero-friction quickstart steps (`git clone` → `npm install` → `npm run db:seed` → `npm run dev`).
+  - [ ] Demo credentials (`demo@stockflow.dev` / `Password123!`).
+  - [ ] **Tech choices and why** (5–10 structured bullet points).
+  - [ ] **Trade-offs and known limitations**.
+  - [ ] **"What I would do with one more week"** section.
+  - [ ] **AI Usage statement** detailing tools and exact workflows.
+  - [ ] Honest time spent estimate.
+- [ ] Verify `.env.example` is complete and contains zero actual secrets.
+- [ ] Verify clean, incremental git commit history following Conventional Commits format (`feat:`, `fix:`, `test:`, `docs:`).
+- [ ] Perform a clean-clone dry run:
+  - [ ] Clone repo into a clean directory.
+  - [ ] Follow README steps strictly.
+  - [ ] Verify app runs and tests pass with **no undocumented steps**.
+
+> 🕹️ **Interactive Debugging & Verification Checkpoint:**
+> 1. Execute `git status` to ensure working tree is clean.
+> 2. Run clean clone test in a temporary folder: `git clone . temp-check && cd temp-check && npm install && npm run db:seed && npm test`.
+> 3. Confirm all tests pass without manual environment tweaking.
 
 ---
 
@@ -239,4 +346,3 @@ The task specification leaves specific sub-libraries (validation, testing framew
 #### D. Lucide React (Iconography)
 - **Why It Was Chosen:**  
   Provides featherweight, accessible SVG icons (status badges, action buttons, search icons) that pair seamlessly with Tailwind CSS classes without introducing bulky component library overhead.
-
