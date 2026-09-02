@@ -1,0 +1,83 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id           String    @id @default(uuid())
+  email        String    @unique
+  passwordHash String
+  name         String
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  products     Product[]
+  invoices     Invoice[]
+}
+
+model Product {
+  id             String          @id @default(uuid())
+  userId         String
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sku            String
+  name           String
+  description    String?
+  unitPrice      Int             // Stored in minor units (cents, >= 0)
+  quantityOnHand Int             // Non-negative inventory (>= 0)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  invoiceItems   InvoiceItem[]
+  stockMovements StockMovement[]
+
+  @@unique([userId, sku])
+  @@index([userId, name])
+}
+
+model Invoice {
+  id             String          @id @default(uuid())
+  userId         String
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  invoiceNumber  String          @unique
+  customerName   String
+  issueDate      DateTime
+  dueDate        DateTime
+  status         String          @default("DRAFT") // DRAFT | ISSUED | PAID | CANCELLED
+  notes          String?
+  subtotal       Int             // Stored in cents
+  taxRate        Int             @default(1100) // 1100 basis points = 11.00%
+  taxAmount      Int             // Stored in cents
+  total          Int             // Stored in cents
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  items          InvoiceItem[]
+  stockMovements StockMovement[]
+
+  @@index([userId, status])
+  @@index([userId, invoiceNumber])
+}
+
+model InvoiceItem {
+  id          String   @id @default(uuid())
+  invoiceId   String
+  invoice     Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  productId   String?
+  product     Product? @relation(fields: [productId], references: [id], onDelete: Restrict)
+  productName String   // Permanent snapshot
+  unitPrice   Int      // Permanent snapshot in cents
+  quantity    Int      // > 0
+  lineTotal   Int      // quantity * unitPrice (cents)
+}
+
+model StockMovement {
+  id             String   @id @default(uuid())
+  productId      String
+  product        Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  invoiceId      String?
+  invoice        Invoice? @relation(fields: [invoiceId], references: [id], onDelete: SetNull)
+  quantityChange Int      // Negative when issued, positive when restored
+  reason         String   // "INITIAL", "INVOICE_ISSUED", "INVOICE_CANCELLED", "MANUAL"
+  createdAt      DateTime @default(now())
+}
