@@ -16,7 +16,6 @@ import {
   XCircle,
   ExternalLink,
   Activity,
-  ShieldCheck,
   Box,
   FileText,
   LogOut,
@@ -146,44 +145,6 @@ const DashboardShell: React.FC = () => {
           >
             Open Swagger UI <ExternalLink className="w-3.5 h-3.5" />
           </a>
-        </div>
-      </div>
-
-      {/* System Invariants Checklist */}
-      <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
-        <h2 className="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
-          <ShieldCheck className="w-5 h-5 text-emerald-600" />
-          Active Security & Isolation Invariants
-        </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
-          <div className="flex items-start gap-2.5">
-            <div className="w-2 h-2 rounded-full bg-emerald-500 mt-1.5 flex-shrink-0"></div>
-            <span className="text-slate-700">
-              <strong>User Workspace Isolation (A7):</strong> All inventory and invoice queries are scoped strictly to{' '}
-              <code className="px-1.5 py-0.5 rounded bg-slate-100 text-xs text-slate-800">
-                {user?.id}
-              </code>
-              .
-            </span>
-          </div>
-          <div className="flex items-start gap-2.5">
-            <div className="w-2 h-2 rounded-full bg-emerald-500 mt-1.5 flex-shrink-0"></div>
-            <span className="text-slate-700">
-              <strong>Bcrypt Password Hashing (A4):</strong> Salt rounds = 12 with individual per-user salt.
-            </span>
-          </div>
-          <div className="flex items-start gap-2.5">
-            <div className="w-2 h-2 rounded-full bg-emerald-500 mt-1.5 flex-shrink-0"></div>
-            <span className="text-slate-700">
-              <strong>Opaque Error Obfuscation (A9):</strong> Invalid login returns generic message, preventing user enumeration.
-            </span>
-          </div>
-          <div className="flex items-start gap-2.5">
-            <div className="w-2 h-2 rounded-full bg-emerald-500 mt-1.5 flex-shrink-0"></div>
-            <span className="text-slate-700">
-              <strong>Server-Side Password Policy (A5):</strong> Minimum 8 characters enforced at API boundary via Zod.
-            </span>
-          </div>
         </div>
       </div>
     </div>

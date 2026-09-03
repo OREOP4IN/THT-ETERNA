@@ -77,8 +77,10 @@ export const CreateInvoicePage: React.FC = () => {
   }, []);
 
   const handleAddItem = () => {
-    const defaultProduct = products.length > 0 ? products[0].id : '';
-    setItems([...items, { productId: defaultProduct, quantity: 1 }]);
+    const selectedProductIds = new Set(items.map((i) => i.productId).filter(Boolean));
+    const nextAvailableProduct = products.find((p) => !selectedProductIds.has(p.id));
+    if (!nextAvailableProduct) return;
+    setItems([...items, { productId: nextAvailableProduct.id, quantity: 1 }]);
   };
 
   const handleRemoveItem = (index: number) => {
@@ -138,6 +140,12 @@ export const CreateInvoicePage: React.FC = () => {
 
     if (items.some((i) => !i.productId)) {
       setError('All invoice line items must have a product selected.');
+      return;
+    }
+
+    const productIds = items.map((i) => i.productId);
+    if (new Set(productIds).size !== productIds.length) {
+      setError('An invoice cannot contain duplicate products. Please adjust the line item quantity instead.');
       return;
     }
 
@@ -322,12 +330,17 @@ export const CreateInvoicePage: React.FC = () => {
                         onChange={(e) => handleProductChange(index, e.target.value)}
                         className="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 outline-none"
                       >
-                        {products.map((p) => (
-                          <option key={p.id} value={p.id}>
-                            {p.name} ({p.sku}) — {formatCurrency(p.unitPrice)} [Stock:{' '}
-                            {p.quantityOnHand}]
-                          </option>
-                        ))}
+                        {products.map((p) => {
+                          const isSelectedElsewhere = items.some(
+                            (other, otherIdx) => otherIdx !== index && other.productId === p.id
+                          );
+                          return (
+                            <option key={p.id} value={p.id} disabled={isSelectedElsewhere}>
+                              {p.name} ({p.sku}) — {formatCurrency(p.unitPrice)} [Stock: {p.quantityOnHand}]
+                              {isSelectedElsewhere ? ' (Already in invoice)' : ''}
+                            </option>
+                          );
+                        })}
                       </select>
                       {line.product && (
                         <div className="flex items-center gap-2 mt-1 text-[11px]">
@@ -395,14 +408,20 @@ export const CreateInvoicePage: React.FC = () => {
               ))}
             </div>
 
-            <button
-              type="button"
-              onClick={handleAddItem}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-dashed border-slate-300 hover:border-blue-500 hover:text-blue-600 text-slate-600 text-xs font-semibold transition"
-            >
-              <Plus className="w-4 h-4" />
-              Add Another Line Item
-            </button>
+            {(() => {
+              const allProductsAdded = products.length > 0 && items.length >= products.length;
+              return (
+                <button
+                  type="button"
+                  disabled={allProductsAdded}
+                  onClick={handleAddItem}
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-dashed border-slate-300 hover:border-blue-500 hover:text-blue-600 text-slate-600 text-xs font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:border-slate-300 disabled:hover:text-slate-600"
+                >
+                  <Plus className="w-4 h-4" />
+                  {allProductsAdded ? 'All Catalog Products Added' : 'Add Another Line Item'}
+                </button>
+              );
+            })()}
           </div>
 
           {/* Financial Summary Card */}

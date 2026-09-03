@@ -25,7 +25,17 @@ export const createInvoiceSchema = z.object({
     .refine((data) => data.dueDate >= data.issueDate, {
       message: 'Due date must be on or after issue date',
       path: ['dueDate'],
-    }),
+    })
+    .refine(
+      (data) => {
+        const productIds = data.items.map((i) => i.productId);
+        return new Set(productIds).size === productIds.length;
+      },
+      {
+        message: 'Duplicate products in invoice lines are not allowed. Adjust the line item quantity instead.',
+        path: ['items'],
+      }
+    ),
 });
 
 export const updateInvoiceSchema = z.object({
@@ -50,6 +60,19 @@ export const updateInvoiceSchema = z.object({
       {
         message: 'Due date must be on or after issue date',
         path: ['dueDate'],
+      }
+    )
+    .refine(
+      (data) => {
+        if (data.items) {
+          const productIds = data.items.map((i) => i.productId);
+          return new Set(productIds).size === productIds.length;
+        }
+        return true;
+      },
+      {
+        message: 'Duplicate products in invoice lines are not allowed. Adjust the line item quantity instead.',
+        path: ['items'],
       }
     ),
   params: z.object({

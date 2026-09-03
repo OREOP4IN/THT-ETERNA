@@ -13,15 +13,30 @@ export class InvoiceService {
     const year = new Date().getFullYear();
     const prefix = `INV-${year}-`;
 
-    const count = await tx.invoice.count({
+    const latest = await tx.invoice.findFirst({
       where: {
         invoiceNumber: {
           startsWith: prefix,
         },
       },
+      orderBy: {
+        invoiceNumber: 'desc',
+      },
+      select: {
+        invoiceNumber: true,
+      },
     });
 
-    const sequence = (count + 1).toString().padStart(4, '0');
+    let nextNumber = 1;
+    if (latest && latest.invoiceNumber) {
+      const parts = latest.invoiceNumber.split('-');
+      const lastSeq = parseInt(parts[parts.length - 1], 10);
+      if (!isNaN(lastSeq)) {
+        nextNumber = lastSeq + 1;
+      }
+    }
+
+    const sequence = nextNumber.toString().padStart(4, '0');
     return `${prefix}${sequence}`;
   }
 
