@@ -105,11 +105,9 @@ npm test
    - Product names and unit prices are snapshotted onto `InvoiceItem` at invoice creation time. Subsequent product edits never alter issued invoices.
 7. **Zod Runtime Request Validation:**
    - Enforces type coercion, password policies, email normalization, and date constraints (`dueDate >= issueDate`) at the network boundary.
-8. **Rate Limiting & Security Hardening:**
-   - `express-rate-limit` protects authentication endpoints against brute-force attacks. `helmet` configures standard HTTP security headers.
-9. **Single Source of Truth for Configuration:**
+8. **Single Source of Truth for Configuration:**
    - Tax rate is configured via `DEFAULT_TAX_PERCENT` in root `.env` and exposed dynamically via `/api/health`, preventing frontend/backend tax drift.
-10. **Tailwind CSS + Responsive Design + Print/PDF Styling:**
+9.  **Tailwind CSS + Responsive Design + Print/PDF Styling:**
     - Clean, responsive UI with interactive modals, debounced search (300ms), stock level indicators, and `@media print` stylesheets for one-click invoice PDF generation.
 
 ---
@@ -119,10 +117,7 @@ npm test
 1. **Stateless JWT Tokens in `localStorage`:**
    - _Trade-off:_ Tokens are stored in browser `localStorage` for clean SPA client integration.
    - _Limitation:_ While protected against CSRF, tokens in `localStorage` are theoretically accessible to XSS. In a high-security banking environment, `httpOnly` secure cookies with server-side CSRF tokens and refresh token rotation would be preferred.
-2. **In-Memory Rate Limiting:**
-   - _Trade-off:_ `express-rate-limit` runs with an in-memory counter to keep reviewer installation friction at zero (no Redis server required).
-   - _Limitation:_ Multi-instance horizontal scaling would require a Redis-backed distributed store.
-3. **Stateless Logout Endpoint:**
+2. **Stateless Logout Endpoint:**
    - _Trade-off:_ Logout clears the token on the client.
    - _Limitation:_ Without a Redis token denylist or database session table, a previously issued token remains valid until its 7-day expiration if intercepted.
 

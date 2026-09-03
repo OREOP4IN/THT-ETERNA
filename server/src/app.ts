@@ -1,6 +1,8 @@
 import express, { Express } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
+import path from 'path';
+import fs from 'fs';
 import { env } from './config/env';
 import { errorHandler } from './middleware/errorHandler';
 import { healthRouter } from './routes/health.routes';
@@ -23,7 +25,7 @@ export const createApp = (): Express => {
   // Cross-Origin Resource Sharing
   app.use(
     cors({
-      origin: [env.CLIENT_URL, 'http://localhost:5173'],
+      origin: [env.CLIENT_URL, 'http://localhost:5173', 'http://localhost:5000', 'http://localhost:8080'],
       credentials: true,
     })
   );
@@ -35,14 +37,14 @@ export const createApp = (): Express => {
   // Swagger Documentation
   setupSwagger(app);
 
-  // Mount Routes
+  // Mount API Routes
   app.use('/api/health', healthRouter);
   app.use('/api/auth', authRouter);
   app.use('/api/products', productRouter);
   app.use('/api/invoices', invoiceRouter);
 
   // 404 Handler for undefined API routes
-  app.use((_req, res) => {
+  app.all('/api/*', (_req, res) => {
     res.status(404).json({
       error: {
         code: 'NOT_FOUND',
@@ -50,6 +52,15 @@ export const createApp = (): Express => {
       },
     });
   });
+
+  // Serve static client assets in production / container deployment
+  const clientDistPath = path.resolve(__dirname, '../../client/dist');
+  if (fs.existsSync(clientDistPath)) {
+    app.use(express.static(clientDistPath));
+    app.get('*', (_req, res) => {
+      res.sendFile(path.join(clientDistPath, 'index.html'));
+    });
+  }
 
   // Global Error Handler
   app.use(errorHandler);
