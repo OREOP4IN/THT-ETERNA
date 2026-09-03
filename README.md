@@ -125,13 +125,11 @@ npm test
 
 ## What I Would Do With One More Week
 
-1. **Refresh Token Rotation & Redis Session Store:**
-   - Implement short-lived access tokens (15m) paired with rotating refresh tokens stored in `httpOnly` cookies, backed by Redis for instantaneous server-side session revocation.
-2. **Automated Server-Side PDF Generation & Email Dispatch:**
-   - Implement a background worker using Puppeteer / PDFKit to render downloadable PDF tax invoices and dispatch them directly to customer emails via SMTP.
-3. **CSV / Excel Bulk Import & Export:**
+1. **Deploy:**
+   - Deploy the web-app to a Cloud Platform for easier access and also for a chance for learning & implementation
+2. **CSV / Excel Bulk Import & Export:**
    - Add bulk product catalog import and export for rapid warehouse inventory onboarding.
-4. **WCAG Compliance:**
+3. **WCAG Compliance:**
    - Optimize the web-app to be compliant to WCAG 2.2 AA to comply to industry standards
 
 ---
