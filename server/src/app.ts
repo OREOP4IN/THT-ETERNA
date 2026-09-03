@@ -1,5 +1,6 @@
 import express, { Express } from 'express';
 import cors from 'cors';
+import helmet from 'helmet';
 import { env } from './config/env';
 import { errorHandler } from './middleware/errorHandler';
 import { healthRouter } from './routes/health.routes';
@@ -10,6 +11,14 @@ import { setupSwagger } from './docs/swagger';
 
 export const createApp = (): Express => {
   const app = express();
+
+  // Security Headers
+  app.use(
+    helmet({
+      contentSecurityPolicy: false,
+      crossOriginResourcePolicy: { policy: 'cross-origin' },
+    })
+  );
 
   // Cross-Origin Resource Sharing
   app.use(
@@ -31,6 +40,16 @@ export const createApp = (): Express => {
   app.use('/api/auth', authRouter);
   app.use('/api/products', productRouter);
   app.use('/api/invoices', invoiceRouter);
+
+  // 404 Handler for undefined API routes
+  app.use((_req, res) => {
+    res.status(404).json({
+      error: {
+        code: 'NOT_FOUND',
+        message: 'The requested API endpoint does not exist',
+      },
+    });
+  });
 
   // Global Error Handler
   app.use(errorHandler);

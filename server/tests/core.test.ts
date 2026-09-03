@@ -48,6 +48,7 @@ describe('StockFlow Core Test Suite (Mandatory & Invariant Tests)', () => {
     if (userId) {
       await prisma.user.delete({ where: { id: userId } }).catch(() => {});
     }
+    await prisma.$disconnect();
   });
 
   // Automated tests in Rule N4 line162, fullstack-js-take-home-test.md

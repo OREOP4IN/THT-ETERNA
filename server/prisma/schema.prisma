@@ -78,6 +78,6 @@ model StockMovement {
   invoiceId      String?
   invoice        Invoice? @relation(fields: [invoiceId], references: [id], onDelete: SetNull)
   quantityChange Int      // Negative when issued, positive when restored
-  reason         String   // "INITIAL", "INVOICE_ISSUED", "INVOICE_CANCELLED", "MANUAL"
+  reason         String   // "INITIAL", "INVOICE_ISSUED", "INVOICE_CANCELLED", "MANUAL_ADJUSTMENT"
   createdAt      DateTime @default(now())
 }

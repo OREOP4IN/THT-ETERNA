@@ -8,6 +8,7 @@ import { ProductsPage } from './pages/ProductsPage';
 import { InvoicesPage } from './pages/InvoicesPage';
 import { CreateInvoicePage } from './pages/CreateInvoicePage';
 import { InvoiceDetailPage } from './pages/InvoiceDetailPage';
+import { NotFoundPage } from './pages/NotFoundPage';
 import { api } from './api/client';
 import {
   Layers,
@@ -311,6 +312,9 @@ export const App: React.FC = () => {
                   </ProtectedRoute>
                 }
               />
+
+              {/* 404 Catch-All Route */}
+              <Route path="*" element={<NotFoundPage />} />
             </Routes>
           </main>
 

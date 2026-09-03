@@ -21,9 +21,6 @@ coverage/
 *.sqlite
 *.sqlite3
 
-# Prisma migrations (ignored until schema is finalized)
-server/prisma/migrations/
-prisma/migrations/
 
 # Documentation & working notes
 TODO.md

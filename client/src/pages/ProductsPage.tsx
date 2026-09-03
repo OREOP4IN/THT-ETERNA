@@ -109,8 +109,15 @@ export const ProductsPage: React.FC = () => {
     }
   }, [search]);
 
+  // Search debounce thank you IG reels
   useEffect(() => {
-    fetchProducts(1, search);
+    const timer = setTimeout(() => {
+      fetchProducts(1, search);
+    }, 300);
+
+    return () => {
+      clearTimeout(timer);
+    };
   }, [fetchProducts, search]);
 
   const handleOpenCreate = () => {
