@@ -5,7 +5,6 @@
 [![React](https://img.shields.io/badge/React-18.3-61dafb.svg)](https://react.dev/)
 [![Prisma](https://img.shields.io/badge/ORM-Prisma-2D3748.svg)](https://www.prisma.io/)
 [![Vitest](https://img.shields.io/badge/Testing-Vitest%20%2B%20Supertest-yellow.svg)](https://vitest.dev/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-purple.svg)](LICENSE)
 
 **StockFlow** is a robust, production-grade inventory and invoicing web application built for small distribution businesses. It addresses the real-world operational challenge of **inventory overselling** by combining atomic database transactions, strict stock guardrails, immutable financial snapshotting, and minor-unit monetary precision.
 
@@ -28,11 +27,7 @@ npm install
 
 ### 2. Environment Configuration
 
-Copy the centralized environment template at the repository root:
-
-```bash
-cp .env.example .env
-```
+Create the centralized `.env` file at the repository root following `.env.example`
 
 ### 3. Initialize & Seed Database
 
@@ -48,9 +43,9 @@ npm run db:seed
 npm run dev
 ```
 
-- **Frontend Web App:** [http://localhost:5173](http://localhost:5173)
-- **Backend REST API:** [http://localhost:5000](http://localhost:5000)
-- **Interactive API Docs:** [http://localhost:5000/api/docs](http://localhost:5000/api/docs)
+- **Frontend Web App       :** [http://localhost:5173](http://localhost:5173)
+- **Backend REST API       :** [http://localhost:5000](http://localhost:5000)
+- **Interactive API Docs   :** [http://localhost:5000/api/docs](http://localhost:5000/api/docs)
 
 ---
 
@@ -89,7 +84,7 @@ npm test
 
 ---
 
-## 🛠️ Technology Choices & Architectural Rationale
+## Technology Choices & Architectural Rationale
 
 1. **TypeScript Strict Mode Monorepo:**
    - Full end-to-end type safety between client and server eliminates contract drift. Strict mode (`strict: true`, `noImplicitAny: true`) for high code hygiene.
@@ -132,14 +127,12 @@ npm test
 
 1. **Refresh Token Rotation & Redis Session Store:**
    - Implement short-lived access tokens (15m) paired with rotating refresh tokens stored in `httpOnly` cookies, backed by Redis for instantaneous server-side session revocation.
-2. **Multi-Currency & Real-Time Exchange Rates:**
-   - Extend minor-unit financial calculations to support multi-currency invoices (USD, EUR, IDR, JPY) with fixed exchange rate snapshots at invoice issuance.
-3. **Granular Role-Based Access Control (RBAC):**
-   - Introduce user roles: `ADMIN`, `WAREHOUSE_OPERATOR` (stock adjustments only), and `BILLING_SPECIALIST` (invoices only).
-4. **Automated Server-Side PDF Generation & Email Dispatch:**
+2. **Automated Server-Side PDF Generation & Email Dispatch:**
    - Implement a background worker using Puppeteer / PDFKit to render downloadable PDF tax invoices and dispatch them directly to customer emails via SMTP.
-5. **CSV / Excel Bulk Import & Export:**
+3. **CSV / Excel Bulk Import & Export:**
    - Add bulk product catalog import and export for rapid warehouse inventory onboarding.
+4. **WCAG Compliance:**
+   - Optimize the web-app to be compliant to WCAG 2.2 AA to comply to industry standards
 
 ---
 
@@ -153,7 +146,7 @@ npm test
 
 ---
 
-## ⏱️ Time Spent
+## Time Spent
 
 - **Total Estimated Time:** ~9 hours
   - **Understanding the Task & Initialization:** ~1 hour
@@ -163,7 +156,7 @@ npm test
 
 ---
 
-## 📋 Available Repository Scripts
+## Available Repository Scripts
 
 | Command             | Description                                                          |
 | ------------------- | -------------------------------------------------------------------- |
