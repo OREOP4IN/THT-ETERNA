@@ -35,7 +35,10 @@ export const updateInvoiceSchema = z.object({
       issueDate: z.coerce.date().optional(),
       dueDate: z.coerce.date().optional(),
       notes: z.string().trim().optional(),
-      items: z.array(invoiceItemInputSchema).min(1, 'An invoice must contain at least one line item').optional(),
+      items: z
+        .array(invoiceItemInputSchema)
+        .min(1, 'An invoice must contain at least one line item')
+        .optional(),
     })
     .refine(
       (data) => {

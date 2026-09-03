@@ -1,7 +1,15 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Layers, AlertCircle, Loader2, KeyRound, Mail, User as UserIcon, ArrowRight } from 'lucide-react';
+import {
+  Layers,
+  AlertCircle,
+  Loader2,
+  KeyRound,
+  Mail,
+  User as UserIcon,
+  ArrowRight,
+} from 'lucide-react';
 import { AxiosError } from 'axios';
 
 export const RegisterPage: React.FC = () => {

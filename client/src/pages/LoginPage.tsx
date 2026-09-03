@@ -31,7 +31,9 @@ export const LoginPage: React.FC = () => {
       navigate(from, { replace: true });
     } catch (err) {
       const axiosErr = err as AxiosError<{ error?: { message?: string } }>;
-      setError(axiosErr.response?.data?.error?.message || 'Login failed. Please check your credentials.');
+      setError(
+        axiosErr.response?.data?.error?.message || 'Login failed. Please check your credentials.'
+      );
     } finally {
       setSubmitting(false);
     }
@@ -135,7 +137,8 @@ export const LoginPage: React.FC = () => {
               ⚡ Fill Demo Account Credentials
             </button>
             <p className="text-[11px] text-slate-600 text-center mt-2">
-              Email: <span className="font-mono text-slate-700">demo@stockflow.dev</span> | Pass: <span className="font-mono text-slate-700">Password123!</span>
+              Email: <span className="font-mono text-slate-700">demo@stockflow.dev</span> | Pass:{' '}
+              <span className="font-mono text-slate-700">Password123!</span>
             </p>
           </div>
         </div>

@@ -60,26 +60,29 @@ export const InvoicesPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchInvoices = useCallback(async (pageToFetch = 1, filter = statusFilter) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await api.get<{ data: Invoice[]; meta: PaginationMeta }>('/invoices', {
-        params: {
-          page: pageToFetch,
-          limit: 10,
-          status: filter === 'ALL' ? undefined : filter,
-        },
-      });
-      setInvoices(res.data.data);
-      setMeta(res.data.meta);
-    } catch (err) {
-      const axiosErr = err as AxiosError<{ error?: { message?: string } }>;
-      setError(axiosErr.response?.data?.error?.message || 'Failed to load invoices');
-    } finally {
-      setLoading(false);
-    }
-  }, [statusFilter]);
+  const fetchInvoices = useCallback(
+    async (pageToFetch = 1, filter = statusFilter) => {
+      setLoading(true);
+      setError(null);
+      try {
+        const res = await api.get<{ data: Invoice[]; meta: PaginationMeta }>('/invoices', {
+          params: {
+            page: pageToFetch,
+            limit: 10,
+            status: filter === 'ALL' ? undefined : filter,
+          },
+        });
+        setInvoices(res.data.data);
+        setMeta(res.data.meta);
+      } catch (err) {
+        const axiosErr = err as AxiosError<{ error?: { message?: string } }>;
+        setError(axiosErr.response?.data?.error?.message || 'Failed to load invoices');
+      } finally {
+        setLoading(false);
+      }
+    },
+    [statusFilter]
+  );
 
   useEffect(() => {
     fetchInvoices(1, statusFilter);

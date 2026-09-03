@@ -57,12 +57,10 @@ describe('StockFlow Core Test Suite (Mandatory & Invariant Tests)', () => {
   // 1. Mandatory Test (a): Wrong Password
   // ==========================================
   it('Mandatory Test (a): Login with incorrect password returns 401 with opaque message', async () => {
-    const res = await request(app)
-      .post('/api/auth/login')
-      .send({
-        email: 'demo@stockflow.dev',
-        password: 'WrongPassword999!',
-      });
+    const res = await request(app).post('/api/auth/login').send({
+      email: 'demo@stockflow.dev',
+      password: 'WrongPassword999!',
+    });
 
     expect(res.status).toBe(401);
     expect(res.body.error).toBeDefined();

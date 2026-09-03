@@ -22,7 +22,10 @@ api.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       // Don't loop if already on auth routes
-      if (!window.location.pathname.startsWith('/login') && !window.location.pathname.startsWith('/register')) {
+      if (
+        !window.location.pathname.startsWith('/login') &&
+        !window.location.pathname.startsWith('/register')
+      ) {
         localStorage.removeItem('stockflow_token');
         localStorage.removeItem('stockflow_user');
       }

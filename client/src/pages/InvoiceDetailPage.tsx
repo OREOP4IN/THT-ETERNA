@@ -50,7 +50,11 @@ export const InvoiceDetailPage: React.FC = () => {
 
   const handleIssue = async () => {
     if (!id) return;
-    if (!window.confirm('Are you sure you want to issue this invoice? This will automatically decrement stock from your inventory.')) {
+    if (
+      !window.confirm(
+        'Are you sure you want to issue this invoice? This will automatically decrement stock from your inventory.'
+      )
+    ) {
       return;
     }
     setActionLoading(true);
@@ -203,7 +207,11 @@ export const InvoiceDetailPage: React.FC = () => {
                 disabled={actionLoading}
                 className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-xs transition cursor-pointer"
               >
-                {actionLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
+                {actionLoading ? (
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                ) : (
+                  <Send className="w-3.5 h-3.5" />
+                )}
                 Issue Invoice
               </button>
             </>
@@ -224,7 +232,11 @@ export const InvoiceDetailPage: React.FC = () => {
                 disabled={actionLoading}
                 className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-xs transition cursor-pointer"
               >
-                {actionLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <CreditCard className="w-3.5 h-3.5" />}
+                {actionLoading ? (
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                ) : (
+                  <CreditCard className="w-3.5 h-3.5" />
+                )}
                 Mark as Paid
               </button>
             </>

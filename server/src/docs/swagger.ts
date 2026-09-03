@@ -125,7 +125,12 @@ export const swaggerDocument = {
           sku: { type: 'string', example: 'SKU-NEW-01' },
           name: { type: 'string', example: 'Laser Barcode Reader' },
           description: { type: 'string', example: 'Industrial grade barcode scanner' },
-          unitPrice: { type: 'integer', minimum: 0, example: 9900, description: 'Price in cents ($99.00)' },
+          unitPrice: {
+            type: 'integer',
+            minimum: 0,
+            example: 9900,
+            description: 'Price in cents ($99.00)',
+          },
           quantityOnHand: { type: 'integer', minimum: 0, example: 20 },
         },
       },
@@ -337,7 +342,11 @@ export const swaggerDocument = {
         parameters: [
           { name: 'page', in: 'query', schema: { type: 'integer', default: 1 } },
           { name: 'limit', in: 'query', schema: { type: 'integer', default: 10 } },
-          { name: 'status', in: 'query', schema: { type: 'string', enum: ['DRAFT', 'ISSUED', 'PAID', 'CANCELLED'] } },
+          {
+            name: 'status',
+            in: 'query',
+            schema: { type: 'string', enum: ['DRAFT', 'ISSUED', 'PAID', 'CANCELLED'] },
+          },
         ],
         responses: {
           '200': { description: 'Paginated invoice list' },

@@ -61,8 +61,8 @@ const DashboardShell: React.FC = () => {
               Welcome back, {user?.name || 'Manager'}!
             </h1>
             <p className="text-slate-600 mt-2 max-w-2xl leading-relaxed">
-              You are signed in to your private workspace ({user?.email}). 
-              Minimal Inventory & Invoicing platform running on Node.js (Express) + React (Vite) + TypeScript + Tailwind CSS. 
+              You are signed in to your private workspace ({user?.email}).
+              Minimal Inventory & Invoicing platform running on Node.js (Express) + React (Vite) + TypeScript + Tailwind CSS.
             </p>
           </div>
 
@@ -159,7 +159,11 @@ const DashboardShell: React.FC = () => {
           <div className="flex items-start gap-2.5">
             <div className="w-2 h-2 rounded-full bg-emerald-500 mt-1.5 flex-shrink-0"></div>
             <span className="text-slate-700">
-              <strong>User Workspace Isolation (A7):</strong> All inventory and invoice queries are scoped strictly to <code className="px-1.5 py-0.5 rounded bg-slate-100 text-xs text-slate-800">{user?.id}</code>.
+              <strong>User Workspace Isolation (A7):</strong> All inventory and invoice queries are scoped strictly to{' '}
+              <code className="px-1.5 py-0.5 rounded bg-slate-100 text-xs text-slate-800">
+                {user?.id}
+              </code>
+              .
             </span>
           </div>
           <div className="flex items-start gap-2.5">
@@ -202,7 +206,10 @@ const NavigationHeader: React.FC = () => {
           <div className="w-9 h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center shadow-sm">
             <Layers className="w-5 h-5" />
           </div>
-          <Link to="/" className="text-xl font-bold text-slate-900 tracking-tight flex items-center gap-1.5">
+          <Link
+            to="/"
+            className="text-xl font-bold text-slate-900 tracking-tight flex items-center gap-1.5"
+          >
             StockFlow
             <span className="text-xs font-semibold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800">
               Dev
@@ -216,10 +223,16 @@ const NavigationHeader: React.FC = () => {
               <Link to="/" className="text-slate-600 hover:text-slate-900 transition-colors">
                 Dashboard
               </Link>
-              <Link to="/products" className="text-slate-600 hover:text-slate-900 transition-colors">
+              <Link
+                to="/products"
+                className="text-slate-600 hover:text-slate-900 transition-colors"
+              >
                 Products
               </Link>
-              <Link to="/invoices" className="text-slate-600 hover:text-slate-900 transition-colors">
+              <Link
+                to="/invoices"
+                className="text-slate-600 hover:text-slate-900 transition-colors"
+              >
                 Invoices
               </Link>
               <div className="h-4 w-px bg-slate-200 mx-1"></div>
@@ -318,7 +331,7 @@ export const App: React.FC = () => {
             </Routes>
           </main>
 
-          {/* Footer */}  
+          {/* Footer */}
           <footer className="border-t border-slate-200 py-6 text-center text-xs text-slate-500 print:hidden">
             StockFlow System • Node.js + Express + React + SQLite • Built for THT-ETERNA
           </footer>

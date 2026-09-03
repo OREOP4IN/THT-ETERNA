@@ -58,8 +58,7 @@ export const CreateInvoicePage: React.FC = () => {
           setTaxPercent(res.data.taxPercent);
         }
       })
-      .catch(() => {
-      });
+      .catch(() => {});
 
     api
       .get<{ data: ProductOption[] }>('/products', { params: { limit: 100 } })

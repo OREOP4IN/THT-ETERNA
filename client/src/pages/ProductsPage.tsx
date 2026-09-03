@@ -88,26 +88,29 @@ export const ProductsPage: React.FC = () => {
     }
   };
 
-  const fetchProducts = useCallback(async (pageToFetch = 1, searchQuery = search) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await api.get<{ data: Product[]; meta: PaginationMeta }>('/products', {
-        params: {
-          page: pageToFetch,
-          limit: 10,
-          search: searchQuery.trim() || undefined,
-        },
-      });
-      setProducts(res.data.data);
-      setMeta(res.data.meta);
-    } catch (err) {
-      const axiosErr = err as AxiosError<{ error?: { message?: string } }>;
-      setError(axiosErr.response?.data?.error?.message || 'Failed to load products');
-    } finally {
-      setLoading(false);
-    }
-  }, [search]);
+  const fetchProducts = useCallback(
+    async (pageToFetch = 1, searchQuery = search) => {
+      setLoading(true);
+      setError(null);
+      try {
+        const res = await api.get<{ data: Product[]; meta: PaginationMeta }>('/products', {
+          params: {
+            page: pageToFetch,
+            limit: 10,
+            search: searchQuery.trim() || undefined,
+          },
+        });
+        setProducts(res.data.data);
+        setMeta(res.data.meta);
+      } catch (err) {
+        const axiosErr = err as AxiosError<{ error?: { message?: string } }>;
+        setError(axiosErr.response?.data?.error?.message || 'Failed to load products');
+      } finally {
+        setLoading(false);
+      }
+    },
+    [search]
+  );
 
   // Search debounce thank you IG reels
   useEffect(() => {
@@ -441,7 +444,10 @@ export const ProductsPage: React.FC = () => {
           <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-200 animate-in fade-in zoom-in-95 duration-150">
             <div className="flex items-center justify-between pb-4 border-b border-slate-100">
               <h3 className="text-lg font-bold text-slate-900">Add New Product</h3>
-              <button onClick={() => setIsCreateOpen(false)} className="text-slate-400 hover:text-slate-600">
+              <button
+                onClick={() => setIsCreateOpen(false)}
+                className="text-slate-400 hover:text-slate-600"
+              >
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -560,9 +566,14 @@ export const ProductsPage: React.FC = () => {
             <div className="flex items-center justify-between pb-4 border-b border-slate-100">
               <div>
                 <h3 className="text-lg font-bold text-slate-900">Edit Product</h3>
-                <span className="font-mono text-xs text-slate-600 font-semibold">{editingProduct.sku}</span>
+                <span className="font-mono text-xs text-slate-600 font-semibold">
+                  {editingProduct.sku}
+                </span>
               </div>
-              <button onClick={() => setEditingProduct(null)} className="text-slate-400 hover:text-slate-600">
+              <button
+                onClick={() => setEditingProduct(null)}
+                className="text-slate-400 hover:text-slate-600"
+              >
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -712,11 +723,15 @@ export const ProductsPage: React.FC = () => {
                     <History className="w-4 h-4" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-bold text-slate-900">Stock Movement Audit Ledger</h3>
+                    <h3 className="text-lg font-bold text-slate-900">
+                      Stock Movement Audit Ledger
+                    </h3>
                     <div className="flex items-center gap-2 text-xs text-slate-500 mt-0.5">
                       <span>{historyProduct.name}</span>
                       <span>•</span>
-                      <span className="font-mono bg-slate-100 px-1.5 py-0.5 rounded text-slate-700">{historyProduct.sku}</span>
+                      <span className="font-mono bg-slate-100 px-1.5 py-0.5 rounded text-slate-700">
+                        {historyProduct.sku}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -733,11 +748,15 @@ export const ProductsPage: React.FC = () => {
             <div className="grid grid-cols-2 gap-4 py-4 border-b border-slate-100 bg-slate-50/60 -mx-6 px-6">
               <div>
                 <div className="text-xs text-slate-500 font-medium">Current Quantity on Hand</div>
-                <div className="text-xl font-bold text-slate-900 mt-0.5">{historyProduct.quantityOnHand} units</div>
+                <div className="text-xl font-bold text-slate-900 mt-0.5">
+                  {historyProduct.quantityOnHand} units
+                </div>
               </div>
               <div>
                 <div className="text-xs text-slate-500 font-medium">Total Recorded Events</div>
-                <div className="text-xl font-bold text-blue-600 mt-0.5">{historyMovements.length} transactions</div>
+                <div className="text-xl font-bold text-blue-600 mt-0.5">
+                  {historyMovements.length} transactions
+                </div>
               </div>
             </div>
 
@@ -795,7 +814,8 @@ export const ProductsPage: React.FC = () => {
                             isPositive ? 'text-emerald-600' : 'text-rose-600'
                           }`}
                         >
-                          {isPositive ? `+${movement.quantityChange}` : movement.quantityChange} units
+                          {isPositive ? `+${movement.quantityChange}` : movement.quantityChange}{' '}
+                          units
                         </div>
                       </div>
                     );

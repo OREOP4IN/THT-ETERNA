@@ -108,7 +108,9 @@ async function main() {
       });
     }
 
-    console.log(`📦 Seeded Product: [${product.sku}] ${product.name} — Stock: ${product.quantityOnHand}, Price: $${(product.unitPrice / 100).toFixed(2)}`);
+    console.log(
+      `📦 Seeded Product: [${product.sku}] ${product.name} — Stock: ${product.quantityOnHand}, Price: $${(product.unitPrice / 100).toFixed(2)}`
+    );
   }
 
   console.log('✅ Database seeding finished successfully!');
