@@ -5,6 +5,9 @@ import { ProtectedRoute } from './components/ProtectedRoute';
 import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
 import { ProductsPage } from './pages/ProductsPage';
+import { InvoicesPage } from './pages/InvoicesPage';
+import { CreateInvoicePage } from './pages/CreateInvoicePage';
+import { InvoiceDetailPage } from './pages/InvoiceDetailPage';
 import { api } from './api/client';
 import {
   Layers,
@@ -288,15 +291,23 @@ export const App: React.FC = () => {
                 path="/invoices"
                 element={
                   <ProtectedRoute>
-                    <div className="max-w-6xl mx-auto px-4 py-8">
-                      <div className="bg-white rounded-2xl border border-slate-200 p-8 text-center">
-                        <FileText className="w-12 h-12 text-blue-600 mx-auto mb-3" />
-                        <h2 className="text-xl font-bold text-slate-900">Invoicing Engine</h2>
-                        <p className="text-slate-600 text-sm mt-1 max-w-md mx-auto">
-                          Interactive invoice creator with reactive minor-unit calculations and stock lifecycle states.
-                        </p>
-                      </div>
-                    </div>
+                    <InvoicesPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/invoices/new"
+                element={
+                  <ProtectedRoute>
+                    <CreateInvoicePage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/invoices/:id"
+                element={
+                  <ProtectedRoute>
+                    <InvoiceDetailPage />
                   </ProtectedRoute>
                 }
               />

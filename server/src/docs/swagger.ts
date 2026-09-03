@@ -329,6 +329,117 @@ export const swaggerDocument = {
         },
       },
     },
+    '/api/invoices': {
+      get: {
+        tags: ['Invoices'],
+        summary: 'List invoices with pagination and status filter',
+        security: [{ BearerAuth: [] }],
+        parameters: [
+          { name: 'page', in: 'query', schema: { type: 'integer', default: 1 } },
+          { name: 'limit', in: 'query', schema: { type: 'integer', default: 10 } },
+          { name: 'status', in: 'query', schema: { type: 'string', enum: ['DRAFT', 'ISSUED', 'PAID', 'CANCELLED'] } },
+        ],
+        responses: {
+          '200': { description: 'Paginated invoice list' },
+          '401': { description: 'Unauthorized' },
+        },
+      },
+      post: {
+        tags: ['Invoices'],
+        summary: 'Create a draft invoice with stock guard',
+        security: [{ BearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                required: ['customerName', 'issueDate', 'dueDate', 'items'],
+                properties: {
+                  customerName: { type: 'string', example: 'Acme Logistics Ltd' },
+                  issueDate: { type: 'string', format: 'date-time' },
+                  dueDate: { type: 'string', format: 'date-time' },
+                  notes: { type: 'string', example: 'Deliver to Bay 4' },
+                  items: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      required: ['productId', 'quantity'],
+                      properties: {
+                        productId: { type: 'string' },
+                        quantity: { type: 'integer', minimum: 1, example: 2 },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          '201': { description: 'Draft invoice created with calculated totals' },
+          '422': { description: 'Stock insufficient for one or more products' },
+        },
+      },
+    },
+    '/api/invoices/{id}': {
+      get: {
+        tags: ['Invoices'],
+        summary: 'Get invoice details by ID with line items',
+        security: [{ BearerAuth: [] }],
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' } }],
+        responses: {
+          '200': { description: 'Invoice details' },
+          '404': { description: 'Invoice not found' },
+        },
+      },
+      put: {
+        tags: ['Invoices'],
+        summary: 'Update DRAFT invoice details or items (blocked if not DRAFT)',
+        security: [{ BearerAuth: [] }],
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' } }],
+        responses: {
+          '200': { description: 'Invoice updated' },
+          '422': { description: 'Only DRAFT invoices can be edited' },
+        },
+      },
+    },
+    '/api/invoices/{id}/issue': {
+      post: {
+        tags: ['Invoices'],
+        summary: 'Issue invoice: atomically decrement product stock on hand (DRAFT -> ISSUED)',
+        security: [{ BearerAuth: [] }],
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' } }],
+        responses: {
+          '200': { description: 'Invoice issued and stock decremented' },
+          '422': { description: 'Stock insufficient or illegal status transition' },
+        },
+      },
+    },
+    '/api/invoices/{id}/pay': {
+      post: {
+        tags: ['Invoices'],
+        summary: 'Mark invoice as paid (ISSUED -> PAID)',
+        security: [{ BearerAuth: [] }],
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' } }],
+        responses: {
+          '200': { description: 'Invoice marked as paid' },
+          '422': { description: 'Only ISSUED invoices can be marked as paid' },
+        },
+      },
+    },
+    '/api/invoices/{id}/cancel': {
+      post: {
+        tags: ['Invoices'],
+        summary: 'Cancel invoice: atomically restores stock if ISSUED (ISSUED/DRAFT -> CANCELLED)',
+        security: [{ BearerAuth: [] }],
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' } }],
+        responses: {
+          '200': { description: 'Invoice cancelled and stock restored if previously issued' },
+          '422': { description: 'PAID invoices cannot be cancelled' },
+        },
+      },
+    },
   },
 };
 

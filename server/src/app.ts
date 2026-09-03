@@ -5,6 +5,7 @@ import { errorHandler } from './middleware/errorHandler';
 import { healthRouter } from './routes/health.routes';
 import { authRouter } from './routes/auth.routes';
 import { productRouter } from './routes/product.routes';
+import { invoiceRouter } from './routes/invoice.routes';
 import { setupSwagger } from './docs/swagger';
 
 export const createApp = (): Express => {
@@ -29,6 +30,7 @@ export const createApp = (): Express => {
   app.use('/api/health', healthRouter);
   app.use('/api/auth', authRouter);
   app.use('/api/products', productRouter);
+  app.use('/api/invoices', invoiceRouter);
 
   // Global Error Handler
   app.use(errorHandler);
