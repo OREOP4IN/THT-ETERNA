@@ -42,6 +42,8 @@ npm run db:migrate
 npm run db:seed
 ```
 
+*(Optional: Inspect database records visually in the browser via `npm run db:studio`)*
+
 ### 4. Start Development Servers
 
 ```bash
@@ -51,6 +53,7 @@ npm run dev
 - **Frontend Web App       :** [http://localhost:5173](http://localhost:5173)
 - **Backend REST API       :** [http://localhost:5000](http://localhost:5000)
 - **Interactive API Docs   :** [http://localhost:5000/api/docs](http://localhost:5000/api/docs)
+- **Prisma DB Studio       :** [http://localhost:5555](http://localhost:5555) (via `npm run db:studio`)
 
 ---
 
