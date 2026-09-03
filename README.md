@@ -149,11 +149,11 @@ npm test
 
 ## Time Spent
 
-- **Total Estimated Time:** ~9 hours
+- **Total Estimated Time:** ~11 hours
   - **Understanding the Task & Initialization:** ~1 hour
   - **Scaffolding the Project:** ~1 hour
   - **Accomplishing MVPs & Testing:** ~5 hours
-  - **Documentation, Minor Tweaks, & Finalization:** ~2 hours
+  - **Documentation, Minor Tweaks, & Finalization:** ~4 hours
 
 ---
 
