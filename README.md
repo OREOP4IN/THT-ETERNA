@@ -138,9 +138,9 @@ npm test
 
 - **Tooling Used:** Antigravity CLI & Deepseek V4 Pro via Openrouter.
 - **Workflows & Collaboration:**
-  - Antigravity CLI was used as an interactive pair programmer for rapid boilerplate scaffolding, exploratory test fixture drafting, and documentation synthesis.
+  - Antigravity CLI was used as an interactive pair programmer for rapid boilerplate scaffolding, drafting, and documentation synthesis.
   - Deepseek V4 Pro was used as a QC representative for evaluating the source code and identifying possible vulnerabilities within the boundary of this task's scope.
-  - Core financial mathematics, atomic state machine transactions, referential integrity guards, user isolation boundaries, and validation schemas were directed, reviewed line-by-line, and verified through automated tests and manual browser walkthroughs.
+  - Core financial mathematics, machine transactions, integrity guards, boundaries, and validation schemas were directed, reviewed line-by-line, and verified through automated tests and manual browser walkthroughs.
 
 ---
 
