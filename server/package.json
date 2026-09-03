@@ -9,9 +9,9 @@
     "start": "node dist/index.js",
     "test": "vitest run",
     "test:watch": "vitest",
-    "db:migrate": "prisma migrate dev",
-    "db:seed": "tsx prisma/seed.ts",
-    "db:studio": "prisma studio"
+    "db:migrate": "dotenv -e ../.env -e .env -- prisma migrate dev",
+    "db:seed": "dotenv -e ../.env -e .env -- tsx prisma/seed.ts",
+    "db:studio": "dotenv -e ../.env -e .env -- prisma studio"
   },
   "dependencies": {
     "@prisma/client": "^5.14.0",
@@ -32,6 +32,7 @@
     "@types/node": "^20.14.2",
     "@types/supertest": "^6.0.2",
     "@types/swagger-ui-express": "^4.1.6",
+    "dotenv-cli": "^11.0.0",
     "prisma": "^5.14.0",
     "supertest": "^7.0.0",
     "tsx": "^4.11.0",
