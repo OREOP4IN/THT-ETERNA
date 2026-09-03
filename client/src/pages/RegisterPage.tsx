@@ -131,7 +131,7 @@ export const RegisterPage: React.FC = () => {
                 />
               </div>
               <p className="text-[11px] text-slate-500 mt-1">
-                Must be at least 8 characters long and will be hashed with Bcrypt (cost 12).
+                Must be at least 8 characters long
               </p>
             </div>
 
