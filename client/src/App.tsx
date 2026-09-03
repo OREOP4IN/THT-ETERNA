@@ -195,7 +195,7 @@ const NavigationHeader: React.FC = () => {
   };
 
   return (
-    <header className="bg-white border-b border-slate-200/80 sticky top-0 z-30">
+    <header className="bg-white border-b border-slate-200/80 sticky top-0 z-30 print:hidden">
       <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center shadow-sm">
@@ -314,8 +314,8 @@ export const App: React.FC = () => {
             </Routes>
           </main>
 
-        {/* Footer */}  
-          <footer className="border-t border-slate-200 py-6 text-center text-xs text-slate-500">
+          {/* Footer */}  
+          <footer className="border-t border-slate-200 py-6 text-center text-xs text-slate-500 print:hidden">
             StockFlow System • Node.js + Express + React + SQLite • Built for THT-ETERNA
           </footer>
         </div>
