@@ -37,13 +37,13 @@ What we do **not** care about:
 
 **Free choices:**
 
-| Concern | Options |
-|---|---|
-| Language | JavaScript or TypeScript (**TypeScript is preferred**) |
-| Database | PostgreSQL, MySQL/MariaDB, SQLite, or MongoDB |
-| ORM / query layer | Prisma, TypeORM, Drizzle, Sequelize, Mongoose, Knex, or raw SQL |
-| Styling / UI kit | Tailwind, MUI, Chakra, shadcn/ui, Bootstrap, or plain CSS |
-| Monorepo vs two folders | Either — just document how to run both |
+| Concern                 | Options                                                         |
+| ----------------------- | --------------------------------------------------------------- |
+| Language                | JavaScript or TypeScript (**TypeScript is preferred**)          |
+| Database                | PostgreSQL, MySQL/MariaDB, SQLite, or MongoDB                   |
+| ORM / query layer       | Prisma, TypeORM, Drizzle, Sequelize, Mongoose, Knex, or raw SQL |
+| Styling / UI kit        | Tailwind, MUI, Chakra, shadcn/ui, Bootstrap, or plain CSS       |
+| Monorepo vs two folders | Either — just document how to run both                          |
 
 **Only hard rules:** the server runtime must be Node.js, and the whole thing must run locally with a documented setup. Use a real database (SQLite counts) — **not** an in-memory array that dies on restart.
 
@@ -66,17 +66,17 @@ They want a simple internal web app where a staff member can:
 
 ### 4.1 Authentication
 
-| # | Requirement |
-|---|---|
-| A1 | **Register** with email + password. Email must be unique and validated. |
-| A2 | **Login** returning a credential (JWT or httpOnly session cookie — your call). |
-| A3 | **Logout** that actually invalidates the client's session/token from the app's point of view. |
-| A4 | Passwords **hashed with bcrypt or argon2** (with per-user salt). Plaintext or reversible encryption is an automatic fail. |
-| A5 | A minimum password policy (e.g. ≥8 chars) enforced **server-side**, not only in the browser. |
-| A6 | **Every** inventory and invoice endpoint requires authentication and returns `401` when unauthenticated. |
-| A7 | Users only see and modify **their own** data (each user is effectively their own workspace). |
-| A8 | Secrets (JWT secret, DB URL) come from environment variables. A committed `.env` holding real secrets is a fail; commit a `.env.example` instead. |
-| A9 | Auth errors must not leak which part was wrong (no "user not found" vs "wrong password" distinction). |
+| #   | Requirement                                                                                                                                       |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| A1  | **Register** with email + password. Email must be unique and validated.                                                                           |
+| A2  | **Login** returning a credential (JWT or httpOnly session cookie — your call).                                                                    |
+| A3  | **Logout** that actually invalidates the client's session/token from the app's point of view.                                                     |
+| A4  | Passwords **hashed with bcrypt or argon2** (with per-user salt). Plaintext or reversible encryption is an automatic fail.                         |
+| A5  | A minimum password policy (e.g. ≥8 chars) enforced **server-side**, not only in the browser.                                                      |
+| A6  | **Every** inventory and invoice endpoint requires authentication and returns `401` when unauthenticated.                                          |
+| A7  | Users only see and modify **their own** data (each user is effectively their own workspace).                                                      |
+| A8  | Secrets (JWT secret, DB URL) come from environment variables. A committed `.env` holding real secrets is a fail; commit a `.env.example` instead. |
+| A9  | Auth errors must not leak which part was wrong (no "user not found" vs "wrong password" distinction).                                             |
 
 ### 4.2 Inventory (Products)
 
@@ -93,12 +93,12 @@ Product
   createdAt / updatedAt
 ```
 
-| # | Requirement |
-|---|---|
-| I1 | Create, read, update, delete a product. |
-| I2 | List products with **pagination** and **search by name or SKU**. |
-| I3 | Server-side validation: `sku` unique, `unitPrice >= 0`, `quantityOnHand >= 0`, required fields present. Return a clear `400`/`422` with field-level messages. |
-| I4 | A product referenced by an existing invoice **must not silently disappear**. Either block the delete with a clear error, or soft-delete. Your choice — document it. |
+| #   | Requirement                                                                                                                                                         |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| I1  | Create, read, update, delete a product.                                                                                                                             |
+| I2  | List products with **pagination** and **search by name or SKU**.                                                                                                    |
+| I3  | Server-side validation: `sku` unique, `unitPrice >= 0`, `quantityOnHand >= 0`, required fields present. Return a clear `400`/`422` with field-level messages.       |
+| I4  | A product referenced by an existing invoice **must not silently disappear**. Either block the delete with a clear error, or soft-delete. Your choice — document it. |
 
 ### 4.3 Invoices
 
@@ -122,18 +122,18 @@ InvoiceItem
   lineTotal
 ```
 
-| # | Requirement |
-|---|---|
-| V1 | Create an invoice with **one or more line items** referencing existing products. |
-| V2 | Server calculates `lineTotal`, `subtotal`, `taxAmount`, `total`. **Never trust totals sent by the client.** |
-| V3 | Tax rate configurable via env var, default **11%**, applied to the subtotal. |
-| V4 | `unitPrice` and `productName` are **snapshotted onto the line item**. Changing a product's price later must **not** change any existing invoice. |
-| V5 | **Stock guard:** an invoice line cannot exceed the product's available `quantityOnHand`. Reject with a clear error naming the product. |
-| V6 | **Issuing** an invoice (`DRAFT → ISSUED`) decrements `quantityOnHand` for every line, **atomically** — either all lines succeed or none do. |
-| V7 | **Cancelling** an `ISSUED` invoice restores the stock it consumed. Cancelling a `DRAFT` invoice restores nothing. |
-| V8 | Status transitions are enforced server-side: `DRAFT → ISSUED → PAID`, `DRAFT → CANCELLED`, `ISSUED → CANCELLED`. `PAID` and `CANCELLED` are terminal. Any other transition returns an error. |
-| V9 | Only `DRAFT` invoices may have their line items edited. |
-| V10 | List invoices with pagination + filter by status; view a single invoice with its line items and totals. |
+| #   | Requirement                                                                                                                                                                                  |
+| --- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| V1  | Create an invoice with **one or more line items** referencing existing products.                                                                                                             |
+| V2  | Server calculates `lineTotal`, `subtotal`, `taxAmount`, `total`. **Never trust totals sent by the client.**                                                                                  |
+| V3  | Tax rate configurable via env var, default **11%**, applied to the subtotal.                                                                                                                 |
+| V4  | `unitPrice` and `productName` are **snapshotted onto the line item**. Changing a product's price later must **not** change any existing invoice.                                             |
+| V5  | **Stock guard:** an invoice line cannot exceed the product's available `quantityOnHand`. Reject with a clear error naming the product.                                                       |
+| V6  | **Issuing** an invoice (`DRAFT → ISSUED`) decrements `quantityOnHand` for every line, **atomically** — either all lines succeed or none do.                                                  |
+| V7  | **Cancelling** an `ISSUED` invoice restores the stock it consumed. Cancelling a `DRAFT` invoice restores nothing.                                                                            |
+| V8  | Status transitions are enforced server-side: `DRAFT → ISSUED → PAID`, `DRAFT → CANCELLED`, `ISSUED → CANCELLED`. `PAID` and `CANCELLED` are terminal. Any other transition returns an error. |
+| V9  | Only `DRAFT` invoices may have their line items edited.                                                                                                                                      |
+| V10 | List invoices with pagination + filter by status; view a single invoice with its line items and totals.                                                                                      |
 
 > **Money:** do not use floating-point arithmetic for currency. Use integer minor units (cents/rupiah) or a decimal type. We will check this.
 
@@ -141,28 +141,28 @@ InvoiceItem
 
 A minimal but working UI is required. Plain styling is completely fine.
 
-| # | Screen |
-|---|---|
-| F1 | Register + Login pages, with server-side errors surfaced to the user |
-| F2 | Products list (search + paginate) with create / edit / delete |
-| F3 | Invoice creation form: enter customer name, add product lines, see live totals |
-| F4 | Invoice list (filter by status) and invoice detail with status actions (Issue / Mark Paid / Cancel) |
-| F5 | Authenticated layout — an unauthenticated visitor is redirected to login |
-| F6 | Loading and error states that do not leave the user staring at a blank screen |
+| #   | Screen                                                                                              |
+| --- | --------------------------------------------------------------------------------------------------- |
+| F1  | Register + Login pages, with server-side errors surfaced to the user                                |
+| F2  | Products list (search + paginate) with create / edit / delete                                       |
+| F3  | Invoice creation form: enter customer name, add product lines, see live totals                      |
+| F4  | Invoice list (filter by status) and invoice detail with status actions (Issue / Mark Paid / Cancel) |
+| F5  | Authenticated layout — an unauthenticated visitor is redirected to login                            |
+| F6  | Loading and error states that do not leave the user staring at a blank screen                       |
 
 ---
 
 ## 5. Non-Functional Requirements
 
-| # | Requirement |
-|---|---|
-| N1 | **README** with: prerequisites, setup steps, env vars, how to run migrations + seed, how to start backend and frontend, how to run tests. |
-| N2 | **`.env.example`** listing every variable with safe placeholder values. |
-| N3 | **Seed script** creating a demo user and a handful of products so we can click around within a minute. Put the demo credentials in the README. |
-| N4 | **Automated tests** — at minimum **5 meaningful tests**, and they must include: (a) login with a wrong password is rejected, (b) an unauthenticated request to a protected route returns 401, (c) invoicing more than the available stock is rejected, (d) issuing an invoice decrements stock correctly, (e) cancelling an issued invoice restores stock. Unit or integration, your choice. |
-| N5 | **API documentation** — Swagger/OpenAPI, a Postman/Bruno collection, or a clear endpoint table in the README. |
-| N6 | **Consistent error responses** with correct HTTP status codes (`400/401/403/404/409/422/500`) and a predictable JSON shape. |
-| N7 | **Git history** with incremental, meaningful commits. A single "initial commit" containing everything scores poorly. |
+| #   | Requirement                                                                                                                                                                                                                                                                                                                                                                                  |
+| --- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| N1  | **README** with: prerequisites, setup steps, env vars, how to run migrations + seed, how to start backend and frontend, how to run tests.                                                                                                                                                                                                                                                    |
+| N2  | **`.env.example`** listing every variable with safe placeholder values.                                                                                                                                                                                                                                                                                                                      |
+| N3  | **Seed script** creating a demo user and a handful of products so we can click around within a minute. Put the demo credentials in the README.                                                                                                                                                                                                                                               |
+| N4  | **Automated tests** — at minimum **5 meaningful tests**, and they must include: (a) login with a wrong password is rejected, (b) an unauthenticated request to a protected route returns 401, (c) invoicing more than the available stock is rejected, (d) issuing an invoice decrements stock correctly, (e) cancelling an issued invoice restores stock. Unit or integration, your choice. |
+| N5  | **API documentation** — Swagger/OpenAPI, a Postman/Bruno collection, or a clear endpoint table in the README.                                                                                                                                                                                                                                                                                |
+| N6  | **Consistent error responses** with correct HTTP status codes (`400/401/403/404/409/422/500`) and a predictable JSON shape.                                                                                                                                                                                                                                                                  |
+| N7  | **Git history** with incremental, meaningful commits. A single "initial commit" containing everything scores poorly.                                                                                                                                                                                                                                                                         |
 
 ---
 
@@ -237,16 +237,16 @@ Unexplainable code is worse than no code.
 
 We score against a written rubric weighted roughly like this:
 
-| Area | Weight |
-|---|---|
-| Core feature completeness | 25% |
-| Business logic & data integrity (stock, totals, transitions, money) | 20% |
-| Authentication & security | 15% |
-| Code quality & architecture | 15% |
-| Data modeling & database usage | 8% |
-| Testing | 8% |
-| API design & error handling | 5% |
-| Developer experience (README, setup, git hygiene) | 4% |
+| Area                                                                | Weight |
+| ------------------------------------------------------------------- | ------ |
+| Core feature completeness                                           | 25%    |
+| Business logic & data integrity (stock, totals, transitions, money) | 20%    |
+| Authentication & security                                           | 15%    |
+| Code quality & architecture                                         | 15%    |
+| Data modeling & database usage                                      | 8%     |
+| Testing                                                             | 8%     |
+| API design & error handling                                         | 5%     |
+| Developer experience (README, setup, git hygiene)                   | 4%     |
 
 Bonus items can add a little on top, but they can never rescue an incomplete core.
 
