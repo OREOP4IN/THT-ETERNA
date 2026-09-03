@@ -29,11 +29,16 @@ npm install
 
 Create the centralized `.env` file at the repository root following `.env.example`
 
+```bash
+cp .env.example .env
+```
+
 ### 3. Initialize & Seed Database
 
-Run the Prisma seed script to provision database tables and realistic demo structure:
+Run the Prisma database migration and seed script to provision tables and realistic demo fixtures:
 
 ```bash
+npm run db:migrate
 npm run db:seed
 ```
 
