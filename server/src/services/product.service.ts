@@ -102,7 +102,7 @@ export class ProductService {
       include: {
         stockMovements: {
           orderBy: { createdAt: 'desc' },
-          take: 10,
+          take: 50,
         },
       },
     });

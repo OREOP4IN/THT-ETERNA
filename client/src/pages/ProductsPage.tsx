@@ -15,8 +15,21 @@ import {
   PackageCheck,
   AlertTriangle,
   RotateCcw,
+  History,
+  ArrowUpRight,
+  ArrowDownLeft,
+  Clock,
 } from 'lucide-react';
 import { AxiosError } from 'axios';
+
+export interface StockMovement {
+  id: string;
+  productId: string;
+  invoiceId?: string | null;
+  quantityChange: number;
+  reason: string;
+  createdAt: string;
+}
 
 export interface Product {
   id: string;
@@ -26,6 +39,7 @@ export interface Product {
   description?: string | null;
   unitPrice: number; // in cents
   quantityOnHand: number;
+  stockMovements?: StockMovement[];
   createdAt: string;
   updatedAt: string;
 }
@@ -48,6 +62,9 @@ export const ProductsPage: React.FC = () => {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [deletingProduct, setDeletingProduct] = useState<Product | null>(null);
+  const [historyProduct, setHistoryProduct] = useState<Product | null>(null);
+  const [historyMovements, setHistoryMovements] = useState<StockMovement[]>([]);
+  const [historyLoading, setHistoryLoading] = useState(false);
   const [modalSubmitting, setModalSubmitting] = useState(false);
   const [modalError, setModalError] = useState<string | null>(null);
 
@@ -57,6 +74,19 @@ export const ProductsPage: React.FC = () => {
   const [description, setDescription] = useState('');
   const [priceInput, setPriceInput] = useState('');
   const [stockInput, setStockInput] = useState('');
+
+  const handleOpenHistory = async (product: Product) => {
+    setHistoryProduct(product);
+    setHistoryLoading(true);
+    try {
+      const res = await api.get<{ data: Product }>(`/products/${product.id}`);
+      setHistoryMovements(res.data.data.stockMovements || []);
+    } catch {
+      setHistoryMovements([]);
+    } finally {
+      setHistoryLoading(false);
+    }
+  };
 
   const fetchProducts = useCallback(async (pageToFetch = 1, searchQuery = search) => {
     setLoading(true);
@@ -329,11 +359,26 @@ export const ProductsPage: React.FC = () => {
                     <td className="py-4 px-6 font-medium text-slate-900">
                       {formatCurrency(product.unitPrice)}
                     </td>
-                    <td className="py-4 px-6">{getStockBadge(product.quantityOnHand)}</td>
-                    <td className="py-4 px-6 text-right space-x-2">
+                    <td className="py-4 px-6">
+                      <button
+                        onClick={() => handleOpenHistory(product)}
+                        className="group focus:outline-none cursor-pointer"
+                        title="Click to view stock audit ledger"
+                      >
+                        {getStockBadge(product.quantityOnHand)}
+                      </button>
+                    </td>
+                    <td className="py-4 px-6 text-right space-x-1">
+                      <button
+                        onClick={() => handleOpenHistory(product)}
+                        className="p-1.5 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition cursor-pointer"
+                        title="View Stock Movement Ledger"
+                      >
+                        <History className="w-4 h-4" />
+                      </button>
                       <button
                         onClick={() => handleOpenEdit(product)}
-                        className="p-1.5 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition"
+                        className="p-1.5 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition cursor-pointer"
                         title="Edit Product"
                       >
                         <Edit2 className="w-4 h-4" />
@@ -343,7 +388,7 @@ export const ProductsPage: React.FC = () => {
                           setDeletingProduct(product);
                           setModalError(null);
                         }}
-                        className="p-1.5 text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition"
+                        className="p-1.5 text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition cursor-pointer"
                         title="Delete Product"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -642,6 +687,123 @@ export const ProductsPage: React.FC = () => {
               >
                 {modalSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
                 Confirm Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Stock Movement Ledger Modal */}
+      {historyProduct && (
+        <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-xl border border-slate-200 animate-in fade-in zoom-in-95 duration-150 max-h-[90vh] flex flex-col">
+            {/* Header */}
+            <div className="flex items-start justify-between pb-4 border-b border-slate-100">
+              <div>
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
+                    <History className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold text-slate-900">Stock Movement Audit Ledger</h3>
+                    <div className="flex items-center gap-2 text-xs text-slate-500 mt-0.5">
+                      <span>{historyProduct.name}</span>
+                      <span>•</span>
+                      <span className="font-mono bg-slate-100 px-1.5 py-0.5 rounded text-slate-700">{historyProduct.sku}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <button
+                onClick={() => setHistoryProduct(null)}
+                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Quick Stats Bar */}
+            <div className="grid grid-cols-2 gap-4 py-4 border-b border-slate-100 bg-slate-50/60 -mx-6 px-6">
+              <div>
+                <div className="text-xs text-slate-500 font-medium">Current Quantity on Hand</div>
+                <div className="text-xl font-bold text-slate-900 mt-0.5">{historyProduct.quantityOnHand} units</div>
+              </div>
+              <div>
+                <div className="text-xs text-slate-500 font-medium">Total Recorded Events</div>
+                <div className="text-xl font-bold text-blue-600 mt-0.5">{historyMovements.length} transactions</div>
+              </div>
+            </div>
+
+            {/* Content List */}
+            <div className="overflow-y-auto flex-1 py-4">
+              {historyLoading ? (
+                <div className="py-12 flex flex-col items-center justify-center text-slate-400">
+                  <Loader2 className="w-6 h-6 animate-spin mb-2" />
+                  <span className="text-xs">Loading movement history...</span>
+                </div>
+              ) : historyMovements.length === 0 ? (
+                <div className="py-12 text-center text-slate-500">
+                  <Clock className="w-8 h-8 text-slate-300 mx-auto mb-2" />
+                  <p className="text-sm font-medium">No recorded movements yet.</p>
+                </div>
+              ) : (
+                <div className="divide-y divide-slate-100">
+                  {historyMovements.map((movement) => {
+                    const isPositive = movement.quantityChange > 0;
+                    return (
+                      <div key={movement.id} className="py-3 flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div
+                            className={`w-8 h-8 rounded-lg flex items-center justify-center ${
+                              isPositive
+                                ? 'bg-emerald-50 text-emerald-600'
+                                : 'bg-rose-50 text-rose-600'
+                            }`}
+                          >
+                            {isPositive ? (
+                              <ArrowDownLeft className="w-4 h-4" />
+                            ) : (
+                              <ArrowUpRight className="w-4 h-4" />
+                            )}
+                          </div>
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs font-semibold uppercase tracking-wider text-slate-800">
+                                {movement.reason.replace(/_/g, ' ')}
+                              </span>
+                              {movement.invoiceId && (
+                                <span className="text-[10px] font-mono bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded">
+                                  Invoice linked
+                                </span>
+                              )}
+                            </div>
+                            <div className="text-xs text-slate-400 mt-0.5">
+                              {new Date(movement.createdAt).toLocaleString()}
+                            </div>
+                          </div>
+                        </div>
+
+                        <div
+                          className={`font-mono font-bold text-sm ${
+                            isPositive ? 'text-emerald-600' : 'text-rose-600'
+                          }`}
+                        >
+                          {isPositive ? `+${movement.quantityChange}` : movement.quantityChange} units
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* Footer */}
+            <div className="pt-4 border-t border-slate-100 flex justify-end">
+              <button
+                onClick={() => setHistoryProduct(null)}
+                className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-semibold transition cursor-pointer"
+              >
+                Close Ledger
               </button>
             </div>
           </div>
